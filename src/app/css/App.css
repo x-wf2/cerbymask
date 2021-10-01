@@ -1,0 +1,110 @@
+textarea:focus,
+input:focus {
+  outline: none;
+}
+
+.App {
+  text-align: center;
+  background-color: #ffefea;
+  color: #282c34;
+  min-height: 100vh;
+  display:flex;
+  flex-direction: column;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  font-size: calc(20px + 2vmin);
+  color: #282c34;
+  box-shadow: 0px 0px 6px #282c34;
+}
+
+.App-title {
+  font-size: 28px;
+  margin-right: 35px;
+}
+.App-cerbie-logo {
+  width: 224px;
+}
+
+.App-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28.7rem;
+}
+
+.App-link {
+  color: #901000;
+  cursor: pointer;
+}
+
+.info-password-title,
+.warn-save-title {
+  margin-top: 0 !important;
+}
+
+.info-password-title {
+  color: #282c34;
+  font-size: 26px;
+}
+
+.info-content-actions {
+  margin-top: 22px;
+  padding: 5px 0px;
+}
+
+.warn-content-actions {
+  padding: 10px 0px;
+}
+
+.warn-save-title {
+  color: #ee2400;
+  font-size: 26px;
+}
+
+.warn-mnemonic {
+  font-size: 16px;
+  word-spacing: 14px;
+  font-style: italic;
+  transform: matrix3d(1, 0, 0, 0, -0.1, 1, 1, 0, 0, 0, 1, 0.5, 0, 0, 0, 1);
+}
+
+.warn-save-text {
+  color: #282c34;
+  font-size: 22px;
+}
+
+.warn-content-wrapper {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.input-password {
+  border: 0;
+  width: 100vw;
+  padding: 12px 0px;
+  text-align: center;
+  font-size: 39px;
+  position: relative;
+}
+
+.button-normal {
+  border-radius: 0 !important;
+  border: 0;
+  background-color: #901000;
+  color: #ffefea;
+  padding: 10px 20px;
+  transition: 0.325s box-shadow;
+  cursor: pointer;
+  box-shadow: 0px 0px 6px #282c34;
+}
+
+.button-normal:hover {
+  box-shadow: 0px 0px 10px #282c34;
+}

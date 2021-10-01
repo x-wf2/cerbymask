@@ -1,0 +1,18 @@
+{
+  "short_name": "CerbiMask",
+  "name": "CerbiMask",
+  "version": "1.0",
+  "manifest_version": 3,
+  "icons": {
+    "16": "android-chrome-192x192.png",
+    "48": "android-chrome-192x192.png",
+    "128": "android-chrome-192x192.png"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "CerbiMask"
+  },
+  "permissions": [
+    "storage"
+  ]
+}
