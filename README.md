@@ -12,7 +12,7 @@ Clone this project in order to use the plugin.
 
 This project has been developed using NodeJS v16.6.
 
-# Install dependencies
+## Install dependencies
 
 After cloning the project, navigate to the root folder and run:
 
@@ -20,7 +20,7 @@ After cloning the project, navigate to the root folder and run:
 $ npm install
 ```
 
-# Build
+## Build
 
 In order to build the extension, execute:
 
@@ -28,7 +28,7 @@ In order to build the extension, execute:
 $ npm run build
 ```
 
-# Tests
+## Tests
 
 Unit tests are developed using Jest.
 
