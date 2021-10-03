@@ -4,6 +4,10 @@
     <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Wallet</p>
 </p>
 
+# Features
+- Chrome based extension
+- Lightweight wallet (~8mb)
+
 # Getting Started 
 
 The plugin is in very early stages of development and it is community driven.
@@ -37,3 +41,9 @@ In order to run tests, execute:
 ```bash
 $ npm run test
 ```
+
+## Install
+
+Navigate to `chrome://extensions`
+
+Locate `Load unpacked` and point to the `build` folder
