@@ -1,5 +1,5 @@
 import { Wallet } from "../../classes/wallet"
-import { MnemomicT, Wallet as RdxWallet, WalletT as RdxWalletT, KeystoreT, Network, SigningKeychain } from '@radixdlt/application'
+import { MnemomicT, KeystoreT, SigningKeychain } from '@radixdlt/application'
 import { Provider } from "../../providers/local";
 
 
@@ -17,5 +17,17 @@ export async function saveWalletForLocalProvider(wallet: Wallet, provider: Provi
             return provider.saveWallet(keystore, wallet)
         }
     })
+    return walletResult
+}
+
+export async function unlockWallet(wallet: Wallet) {
+    const walletResult = await SigningKeychain.byLoadingAndDecryptingKeystore({
+        password: wallet.password as string,
+        load: (): Promise<KeystoreT> => {
+            return new Promise((resolve) => resolve(wallet.key?.keystore as KeystoreT))
+        }
+    })
+    if (walletResult.isErr())
+        return undefined
     return walletResult
 }

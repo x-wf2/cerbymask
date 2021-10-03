@@ -27,3 +27,13 @@ In order to build the extension, execute:
 ```bash
 $ npm run build
 ```
+
+# Tests
+
+Unit tests are developed using Jest.
+
+In order to run tests, execute:
+
+```bash
+$ npm run test
+```

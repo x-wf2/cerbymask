@@ -11,8 +11,8 @@ export interface Provider {
 export class LocalProvider implements Provider {
     walletFactory: WalletFactoryInterface;
 
-    constructor() {
-        this.walletFactory = new LocalWalletFactory()
+    constructor(walletFactory?: WalletFactoryInterface) {
+        this.walletFactory = walletFactory ? walletFactory : new LocalWalletFactory()
     }
     newWallet(): Promise<Wallet> {
         return this.walletFactory.newWallet()

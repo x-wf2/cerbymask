@@ -59,6 +59,10 @@ input:focus {
   padding: 5px 0px;
 }
 
+.info-content-subactions {
+  margin-top: 10px;
+}
+
 .warn-content-actions {
   padding: 10px 0px;
 }

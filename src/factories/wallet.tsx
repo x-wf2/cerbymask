@@ -1,5 +1,6 @@
 import { Wallet } from "../classes/wallet"
 import { KeystoreT } from '@radixdlt/crypto'
+import { SigningKeychainT } from "@radixdlt/account";
 
 export interface WalletFactoryInterface {
     newWallet(): Promise<Wallet>;
@@ -45,27 +46,23 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
                             const error = chrome.runtime.lastError;
                             if (error) throw Error
                             
-                            let ks = keystore["keystore"];
-                            let s = seed["seed"];
-
                             wallet = new Wallet()
                             wallet.key = Wallet.newKey()
-                            wallet.key.keystore = ks
-                            wallet.key.mnemonic = s
+                            
+                            wallet.key.keystore = keystore["keystore"]
+                            wallet.key.mnemonic = seed["seed"]
 
-                            console.log(wallet)
-                            resolve(wallet as Wallet)
+                            resolve(wallet)
                         }
                         catch (e) {
                             wallet = await this.newWallet()
-                            resolve(wallet as Wallet)
+                            resolve(wallet)
                         }
                     })
                 }
                 catch (e) {
-                    console.log(e)
                     wallet = await this.newWallet()
-                    resolve(wallet as Wallet)
+                    resolve(wallet)
                 }
             })
         })
