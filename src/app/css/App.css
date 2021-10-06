@@ -13,9 +13,10 @@ input:focus {
 }
 
 .App-header {
+  width: 100%;
   display: flex;
   flex-direction: row;
-  justify-items: center;
+  justify-content: space-between;
   align-items: center;
   align-content: center;
   justify-content: center;
@@ -25,18 +26,19 @@ input:focus {
 }
 
 .App-title {
-  font-size: 28px;
-  margin-right: 35px;
+  font-size: 20px;
+  margin-right: 21px;
 }
+
 .App-cerbie-logo {
-  width: 224px;
+  width: 121px;
 }
 
 .App-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 28.7rem;
+  min-height: 32.8rem;
 }
 
 .App-link {
@@ -111,4 +113,15 @@ input:focus {
 
 .button-normal:hover {
   box-shadow: 0px 0px 10px #282c34;
+}
+
+.mnemonic-input-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.mnemonic-input-word {
+  width: 20%;
+  margin: 5px;
+  border: 0;
+  text-align: center;
 }

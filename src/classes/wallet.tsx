@@ -15,4 +15,8 @@ export class Wallet {
     static newKey() {
         return new Key()
     }
+
+    static newKeyWithMnemonic(mnemonic: string) {
+        return new Key(mnemonic)
+    }
 }
