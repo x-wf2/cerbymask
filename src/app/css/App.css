@@ -1,15 +1,28 @@
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: local('IBM Plex Sans'), url(../font/IBM_Plex_Sans/IBMPlexSans-Medium.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: local('IBM Plex Sans'), url(../font/IBM_Plex_Sans/IBMPlexSans-Bold.ttf) format('truetype');
+  font-weight: bold;
+}
+
 textarea:focus,
-input:focus {
+input:focus,
+select:focus {
   outline: none;
 }
 
 .App {
   text-align: center;
-  background-color: #ffefea;
+  background-color: rgba(255, 255, 255, 0.9);
   color: #282c34;
   min-height: 100vh;
   display:flex;
   flex-direction: column;
+  font-family: 'IBM Plex Sans', sans-serif;
 }
 
 .App-header {
@@ -41,19 +54,34 @@ input:focus {
   min-height: 32.8rem;
 }
 
+.full-height-container {
+  min-height: 32.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
 .App-link {
   color: #901000;
   cursor: pointer;
 }
 
-.info-password-title,
-.warn-save-title {
+.info-password-title {
+  color: rgb(0, 48, 87);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.info-landing-title {
+  margin: 0;
   margin-top: 0 !important;
 }
 
-.info-password-title {
-  color: #282c34;
-  font-size: 26px;
+.info-password-subtitle {
+  color: rgb(0 48 87 / 40%);
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 4px;
+  margin-bottom: 36px;
 }
 
 .info-content-actions {
@@ -98,30 +126,32 @@ input:focus {
   text-align: center;
   font-size: 39px;
   position: relative;
+  background-color: #f2f2fc;
 }
 
 .button-normal {
   border-radius: 0 !important;
   border: 0;
-  background-color: #901000;
-  color: #ffefea;
+  background-color: #282c34;
+  color: #f2f2fc;
   padding: 10px 20px;
-  transition: 0.325s box-shadow;
+  transition: 0.225s background-color;
   cursor: pointer;
-  box-shadow: 0px 0px 6px #282c34;
 }
 
 .button-normal:hover {
-  box-shadow: 0px 0px 10px #282c34;
+  background-color: #00c389;
 }
 
 .mnemonic-input-container {
   display: flex;
   flex-wrap: wrap;
 }
+
 .mnemonic-input-word {
   width: 20%;
   margin: 5px;
   border: 0;
   text-align: center;
+  background-color: #f2f2fc;
 }

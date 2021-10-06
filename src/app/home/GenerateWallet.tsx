@@ -21,6 +21,7 @@ export default function GenerateWallet(props: any) {
                     </div>
                     <div className="warn-content-actions">
                         <p className="App-link" onClick={() => setSeedSaved(true)}>I have saved the seed</p>
+                        <p className="App-link" onClick={() => props.onCompleteWallet()}>Cancel</p>
                     </div>
                 </div>
             }
@@ -33,6 +34,7 @@ export default function GenerateWallet(props: any) {
                     </div>
                     <div className="info-content-actions">
                         <p className="App-link" onClick={() => { setPasswordSaved(true); props.onCreateWallet() }}>Continue</p>
+                        <p className="App-link" onClick={() => props.onCompleteWallet()}>Cancel</p>
                     </div>
                 </div>
             }

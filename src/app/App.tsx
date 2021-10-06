@@ -9,7 +9,7 @@ import { generateWalletWithKeyAndMnemonic, saveWalletForLocalProvider, unlockWal
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
-import { AccountAddressT, AccountT, RadixT, MnemomicT } from '@radixdlt/application';
+import { AccountAddressT, AccountT, RadixT, MnemomicT, WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
 import Key from '../classes/key';
 
@@ -55,22 +55,24 @@ export default class App extends Component<IProps, IState> {
             onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, resetting: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
 
             onUnlockWallet: async () => {
-                let radixWallet = await unlockWallet(this.state.wallet)
+                let radixWallet: RadixWalletT
                 let radixPublicAddresses: AccountT[] = []
-
-                if (radixWallet) {
-                    this.setState((state) => ({ ...state, wallet: { ...state.wallet, unlocked: true } }))
-                    radixWallet.observeAccounts().forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
-                    this.setState((state) => ({
-                        ...state, wallet: {
-                            ...state.wallet,
-                            radixWallet: radixWallet,
-                            radixPublicAddresses: radixPublicAddresses
-                        }
-                    }))
+                try {
+                    radixWallet = await unlockWallet(this.state.wallet)
+                }
+                catch (e) {
+                    this.setState((state) => ({ ...state, error: "Unable to unlock wallet" }))
                     return
                 }
-                this.setState((state) => ({ ...state, error: "Unable to unlock wallet." }))
+                this.setState((state) => ({ ...state, wallet: { ...state.wallet, unlocked: true } }))
+                radixWallet.observeAccounts().forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
+                this.setState((state) => ({
+                    ...state, wallet: {
+                        ...state.wallet,
+                        radixWallet: radixWallet,
+                        radixPublicAddresses: radixPublicAddresses
+                    }
+                }))
             }
         }
     }
@@ -142,11 +144,9 @@ export default class App extends Component<IProps, IState> {
                         </ForgotPassword>
                     }
                     {this.state.wallet.unlocked &&
-                        <div>
-                            <ShowWallet
-                                wallet={this.state.wallet}>
-                            </ShowWallet>
-                        </div>
+                        <ShowWallet
+                            wallet={this.state.wallet}>
+                        </ShowWallet>
                     }
                 </div>
             </div>

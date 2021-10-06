@@ -24,22 +24,23 @@ export default function ForgotPassword(props: any) {
                     <div className="warn-content-wrapper">
                         <p className="warn-save-text">Please insert the seed phrase you wish to load:</p>
                         <div className="mnemonic-input-container">
-                            <input className="mnemonic-input-word" value="item" type="text"></input>
-                            <input className="mnemonic-input-word" value="shallow" type="text"></input>
-                            <input className="mnemonic-input-word" value="measure" type="text"></input>
-                            <input className="mnemonic-input-word" value="weasel" type="text"></input>
-                            <input className="mnemonic-input-word" value="post" type="text"></input>
-                            <input className="mnemonic-input-word" value="carbon" type="text"></input>
-                            <input className="mnemonic-input-word" value="captain" type="text"></input>
-                            <input className="mnemonic-input-word" value="reunion" type="text"></input>
-                            <input className="mnemonic-input-word" value="direct" type="text"></input>
-                            <input className="mnemonic-input-word" value="wrap" type="text"></input>
-                            <input className="mnemonic-input-word" value="program" type="text"></input>
-                            <input className="mnemonic-input-word" value="green" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
+                            <input className="mnemonic-input-word" type="text"></input>
                         </div>
                     </div>
                     <div className="warn-content-actions">
                         <p className="App-link" onClick={() => next()}>Next</p>
+                        <p className="App-link" onClick={() => props.onCompleteWallet()}>Cancel</p>
                     </div>
                 </div>
             }

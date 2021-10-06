@@ -6,7 +6,7 @@ export default function UnlockWallet(props: any) {
         <div style={{ overflowX: "auto" }}>
             <div>
                 {props.error && <p className="warn-save-title">{props.error}</p> }
-                <p className="info-password-title">Unlock Wallet</p>
+                <p className="info-password-title">Welcome Back!</p>
                 <div className="info-content-wrapper">
                     <input className="input-password" type="password" onChange={(e) => props.onPasswordChange(e)}></input>
                 </div>
