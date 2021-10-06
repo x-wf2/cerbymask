@@ -20,9 +20,7 @@ export default function GenerateWallet(props: any) {
                         <p className="warn-save-text"> You will not be able to access it otherwise, and we will not be able to help you.</p>
                     </div>
                     <div className="warn-content-actions">
-                        <button className="button-normal" onClick={() => setSeedSaved(true)}>
-                            I have saved the seed
-                        </button>
+                        <p className="App-link" onClick={() => setSeedSaved(true)}>I have saved the seed</p>
                     </div>
                 </div>
             }
@@ -34,14 +32,17 @@ export default function GenerateWallet(props: any) {
                         <input className="input-password" type="password" onChange={(e) => props.onPasswordChange(e)}></input>
                     </div>
                     <div className="info-content-actions">
-                        <button className="button-normal" onClick={() => {setPasswordSaved(true); props.onCreateWallet()}}>
-                            Continue
-                        </button>
+                        <p className="App-link" onClick={() => { setPasswordSaved(true); props.onCreateWallet() }}>Continue</p>
                     </div>
                 </div>
             }
             {props.wallet.key && seedSaved && passwordSaved &&
-                <p>{JSON.stringify(props.wallet)}</p>
+                <div>
+                    <p>Your wallet has been saved.</p>
+                    <div className="info-content-subactions">
+                        <p className="App-link" onClick={() => props.onCompleteWallet()}>OK</p>
+                    </div>
+                </div>
             }
         </div>
     )

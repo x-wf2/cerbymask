@@ -9,6 +9,7 @@ import { generateWalletWithKeyAndMnemonic, saveWalletForLocalProvider, unlockWal
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
+import { AccountAddressT, AccountT, RadixT } from '@radixdlt/application';
 
 interface IProps {
 }
@@ -16,6 +17,7 @@ interface IProps {
 interface IState {
     wallet: Wallet;
     provider: Provider;
+    radix: RadixT;
     error: string;
 
     loading: boolean;
@@ -23,6 +25,7 @@ interface IState {
 
     onPasswordChange: Function;
     onCreateWallet: Function;
+    onCompleteWallet: Function;
     onUnlockWallet: Function;
 }
 
@@ -34,6 +37,7 @@ export default class App extends Component<IProps, IState> {
         this.state = {
             wallet: new Wallet(),
             provider: new LocalProvider(),
+            radix: {} as RadixT,
             error: "",
 
             loading: true,
@@ -41,13 +45,23 @@ export default class App extends Component<IProps, IState> {
 
             onPasswordChange: (event: any) => { this.setState((state) => ({ ...state, wallet: { ...state.wallet, password: event.target.value } })) },
             onCreateWallet: () => { saveWalletForLocalProvider(this.state.wallet, this.state.provider) },
+            onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
             onUnlockWallet: async () => {
-                let wallet = await unlockWallet(this.state.wallet)
-                if (wallet) {
+                let radixWallet = await unlockWallet(this.state.wallet)
+                let radixPublicAddresses: AccountT[] = []
+
+                if (radixWallet) {
                     this.setState((state) => ({ ...state, wallet: { ...state.wallet, unlocked: true } }))
-                    wallet?.value.observeActiveSigningKey().forEach((key) => {
-                        console.log(key.toString())
-                    })
+                    
+                    radixWallet.observeAccounts().forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
+                    
+                    this.setState((state) => ({ ...state, wallet: { 
+                        ...state.wallet,
+                        radixWallet: radixWallet,
+                        radixPublicAddresses: radixPublicAddresses
+                    } }))
+
+                    let connect = await this.state.provider.connectWallet(this.state.wallet)
                     return
                 }
                 this.setState((state) => ({ ...state, error: "Unable to unlock wallet." }))
@@ -56,10 +70,7 @@ export default class App extends Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        this.setState((state) => ({ ...state, loading: true }))
-
-        let wallet = await this.state.provider.getWallet();
-        this.setState((state) => ({ ...state, wallet: wallet, loading: false }))
+        this.refreshWallet()
     }
 
     async showGenerateWallet() {
@@ -67,6 +78,12 @@ export default class App extends Component<IProps, IState> {
 
         let wallet = await generateWalletWithKeyAndMnemonic();
         this.setState((state) => ({ ...state, wallet: wallet }))
+    }
+
+    async refreshWallet() {
+        this.setState((state) => ({ ...state, loading: true }))
+        let wallet = await this.state.provider.getWallet();
+        this.setState((state) => ({ ...state, wallet: wallet, loading: false }))
     }
 
     render(): ReactNode {
@@ -91,7 +108,8 @@ export default class App extends Component<IProps, IState> {
                         <GenerateWallet
                             wallet={this.state.wallet}
                             onPasswordChange={this.state.onPasswordChange}
-                            onCreateWallet={this.state.onCreateWallet}>
+                            onCreateWallet={this.state.onCreateWallet}
+                            onCompleteWallet={this.state.onCompleteWallet}>
                         </GenerateWallet>
                     }
                     {this.state.wallet.key !== undefined && !this.state.generating && this.state.wallet.unlocked === false &&

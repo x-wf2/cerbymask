@@ -1,11 +1,16 @@
+import { AccountAddressT } from "@radixdlt/account";
+import { WalletT as RadixWalletT, Wallet as RadixWallet, AccountT } from "@radixdlt/application";
 import Key from "./key";
 
 export class Wallet {
-    password?: string;
     key?: Key;
     unlocked: Boolean;
+    password?: string;
 
-    constructor() { this.unlocked = false }
+    radixWallet?: RadixWalletT;
+    radixPublicAddresses?: AccountT[];
+
+    constructor() { this.unlocked = false;}
 
     static newKey() {
         return new Key()
