@@ -1,8 +1,10 @@
-import { Wallet } from "../../classes/wallet"
-import { MnemomicT, KeystoreT, SigningKeychain, SigningKeychainT, Wallet as RadixWallet, WalletT as RadixWalletT, Network as RadixNetwork } from '@radixdlt/application'
+import { Wallet, WalletBalanceT } from "../../classes/wallet"
+import { MnemomicT, KeystoreT, SigningKeychain, SigningKeychainT, Wallet as RadixWallet, WalletT as RadixWalletT, Network as RadixNetwork, AccountT } from '@radixdlt/application'
 import { Provider } from "../../providers/local";
 import { resolve } from "path";
-
+import { getCurrentXRDUSDValue, getWalletBalance } from "./background";
+import BigNumber from "bignumber.js"
+import { formatBigNumber, numberFormatUSA } from "./formatters";
 
 export async function generateWalletWithKeyAndMnemonic() {
     let wallet = new Wallet();
@@ -44,5 +46,20 @@ export function unlockWallet(wallet: Wallet): Promise<RadixWalletT> {
             error => new Function(),
         )
     })
+}
 
+export async function getXRDUSDBalances(radixPublicAddresses: AccountT[]) {
+    let xrdValue = (await getCurrentXRDUSDValue())
+
+    return Promise.all(radixPublicAddresses.map(async (address) => {
+        let balance = (await getWalletBalance(address?.address.toString()))[0]
+        let usdBalance = new BigNumber(balance?.amount.value.toString())
+                                .multipliedBy(parseFloat(xrdValue.bid))
+                                .shiftedBy(-18).toFixed(4)
+        return { 
+            address: address.address.toString(),
+            xrd: !balance ? undefined : balance?.amount,
+            balance: !balance ? 0 : usdBalance
+        } as WalletBalanceT
+    }))
 }

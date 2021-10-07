@@ -1,25 +1,26 @@
 import React, { Component, ReactNode } from 'react';
 import { LocalProvider, Provider } from '../providers/local';
-import { Wallet } from '../classes/wallet';
+import { Wallet, WalletBalanceT } from '../classes/wallet';
 import NoWalletsFound from './home/NoWalletsFound';
 import GenerateWallet from './home/GenerateWallet';
 import UnlockWallet from './home/UnlockWallet';
 import ShowWallet from './home/ShowWallet';
-import { generateWalletWithKeyAndMnemonic, saveWalletForLocalProvider, unlockWallet } from './utils/utils';
+import { generateWalletWithKeyAndMnemonic, getXRDUSDBalances, saveWalletForLocalProvider, unlockWallet } from './utils/utils';
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
-import { AccountAddressT, AccountT, RadixT, MnemomicT, WalletT as RadixWalletT } from '@radixdlt/application';
+import { AccountAddressT, AccountT, Amount, RadixT, MnemomicT, WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
 import Key from '../classes/key';
+import { getCurrentXRDUSDValue, getWalletBalance } from './utils/background';
+import BigNumber from "bignumber.js"
 
-interface IProps {
+interface ICerbieProps {
 }
 
-interface IState {
+interface ICerbieState {
     wallet: Wallet;
     provider: Provider;
-    radix: RadixT;
     error: string;
 
     loading: boolean;
@@ -33,7 +34,7 @@ interface IState {
     onUnlockWallet: Function;
 }
 
-export default class App extends Component<IProps, IState> {
+export default class App extends Component<ICerbieProps, ICerbieState> {
 
     constructor(props: any) {
         super(props)
@@ -41,7 +42,6 @@ export default class App extends Component<IProps, IState> {
         this.state = {
             wallet: new Wallet(),
             provider: new LocalProvider(),
-            radix: {} as RadixT,
             error: "",
 
             loading: true,
@@ -64,13 +64,21 @@ export default class App extends Component<IProps, IState> {
                     this.setState((state) => ({ ...state, error: "Unable to unlock wallet" }))
                     return
                 }
+                // Unlock
                 this.setState((state) => ({ ...state, wallet: { ...state.wallet, unlocked: true } }))
+
+                // Public Addresses
+                radixWallet.deriveNextLocalHDAccount()
                 radixWallet.observeAccounts().forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
+
+                // Balances
+                let balances = await getXRDUSDBalances(radixPublicAddresses)
                 this.setState((state) => ({
                     ...state, wallet: {
                         ...state.wallet,
                         radixWallet: radixWallet,
-                        radixPublicAddresses: radixPublicAddresses
+                        radixPublicAddresses: radixPublicAddresses,
+                        radixBalances: balances
                     }
                 }))
             }
@@ -83,7 +91,6 @@ export default class App extends Component<IProps, IState> {
 
     async showGenerateWallet() {
         this.setState((state) => ({ ...state, generating: true }))
-
         let wallet = await generateWalletWithKeyAndMnemonic();
         this.setState((state) => ({ ...state, wallet: wallet }))
     }

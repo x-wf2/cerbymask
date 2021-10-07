@@ -2,6 +2,12 @@ import { AccountAddressT } from "@radixdlt/account";
 import { WalletT as RadixWalletT, Wallet as RadixWallet, AccountT } from "@radixdlt/application";
 import Key from "./key";
 
+export type WalletBalanceT = Readonly<{
+    address: string,
+    balance: string,
+    xrd?: any;
+}>
+
 export class Wallet {
     key?: Key;
     unlocked: Boolean;
@@ -9,6 +15,7 @@ export class Wallet {
 
     radixWallet?: RadixWalletT;
     radixPublicAddresses?: AccountT[];
+    radixBalances?: WalletBalanceT[];
 
     constructor() { this.unlocked = false;}
 

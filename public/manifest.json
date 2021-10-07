@@ -15,5 +15,12 @@
   },
   "permissions": [
     "storage"
-  ]
+  ],
+  "host_permissions": [
+    "https://mainnet.radixdlt.com/*",
+    "https://api.bitfinex.com/*"
+  ],
+  "background": {
+    "service_worker": "radix.js"
+  }
 }
