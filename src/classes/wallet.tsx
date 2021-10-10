@@ -8,16 +8,37 @@ export type WalletBalanceT = Readonly<{
     xrd?: any;
 }>
 
+export type WalletStakeT = Readonly<{
+    address: string,
+    initial: string,
+    rewards: string,
+    unstaking: string,
+    staked: string;
+    balance: string;
+}>
+
 export class Wallet {
     key?: Key;
     unlocked: Boolean;
     password?: string;
 
-    radixWallet?: RadixWalletT;
-    radixPublicAddresses?: AccountT[];
-    radixBalances?: WalletBalanceT[];
+    addresses: number;
+    selectedAddress: number;
 
-    constructor() { this.unlocked = false;}
+    radixWallet?: RadixWalletT;
+    radixPublicAddresses: AccountT[];
+    radixBalances: WalletBalanceT[];
+    radixStakes: WalletStakeT[];
+
+    constructor() { 
+        this.unlocked = false;
+        this.selectedAddress = 0;
+        this.addresses = 2;
+
+        this.radixPublicAddresses = []
+        this.radixBalances = []
+        this.radixStakes = []
+    }
 
     static newKey() {
         return new Key()

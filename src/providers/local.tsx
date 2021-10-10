@@ -6,17 +6,17 @@ import NetworkFactory, { NetworkFactoryInterface } from "../factories/network";
 import { Network } from "../classes/network";
 import { first } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs'
-import { 
-        AccountAddress,
-        AccountsT,
-        AccountT,
-        Radix,
-        RadixT,
-        Network as RadixNetwork,
-        Wallet as RadixWallet,
-        SigningKeychain,
-        SigningKeychainT
-    } from "@radixdlt/application";
+import {
+    AccountAddress,
+    AccountsT,
+    AccountT,
+    Radix,
+    RadixT,
+    Network as RadixNetwork,
+    Wallet as RadixWallet,
+    SigningKeychain,
+    SigningKeychainT
+} from "@radixdlt/application";
 
 export interface Provider {
     getWallet(): Promise<Wallet>;
@@ -24,6 +24,8 @@ export interface Provider {
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void>;
     connectWallet(wallet: Wallet): Promise<boolean>;
     getInstance(): RadixT;
+    saveViewingAddress(index: number): Promise<void>;
+    getViewingAddress(): Promise<number>;
 }
 
 export class LocalProvider implements Provider {
@@ -40,15 +42,27 @@ export class LocalProvider implements Provider {
 
         this.networkFactory.newNetwork("MAINNET", "https://mainnet.radixdlt.com")
     }
+
+    getViewingAddress(): Promise<number> {
+        throw this.walletFactory.getViewingAddress()
+    }
+
+    saveViewingAddress(index: number): Promise<void> {
+        return this.walletFactory.saveViewingAddress(index)
+    }
+
     newWallet(): Promise<Wallet> {
         return this.walletFactory.newWallet()
     }
+
     getWallet(): Promise<Wallet> {
         return this.walletFactory.getWallet()
     }
+
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void> {
         return this.walletFactory.saveWallet(keystore, wallet)
     }
+
     connectWallet(wallet: Wallet): Promise<boolean> {
         return new Promise(async (finish) => {
             console.log("Connecting Wallet...")

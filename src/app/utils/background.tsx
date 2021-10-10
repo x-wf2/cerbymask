@@ -7,10 +7,23 @@ export type RequestT = Readonly<{
     data: object
 }>
 
+export type XRDValueT = Readonly<{
+    response: object,
+    lastUpdate: Date
+}>
+
+let XRDValueCache: XRDValueT;
+
 export function getCurrentXRDUSDValue(): Promise<any> {
     return new Promise(async (resolve) => {
-        let response = await generateBackgroundRequest("get-xrdusd-value", {})
-        resolve(response)
+        if(!XRDValueCache || (Number(new Date()) - Number(XRDValueCache.lastUpdate)) > 5000) {
+            let response = await generateBackgroundRequest("get-xrdusd-value", {})
+            XRDValueCache = {
+                response: response,
+                lastUpdate: new Date()
+            } as XRDValueT
+        }
+        resolve(XRDValueCache.response)
     })
 }
 
@@ -19,6 +32,13 @@ export function getWalletBalance(address: string): Promise<any> {
         let response = await generateBackgroundRequest("get-wallet-funds", { address: address })
         let filtered = response.map((item: any) => {return {...item, amount: Amount.fromUnsafe(item.amount)}})
         resolve(filtered)
+    })
+}
+
+export function getStakedPositions(address: string): Promise<any> {
+    return new Promise(async (resolve) => {
+        let response = await generateBackgroundRequest("get-staked-positions", { address: address })
+        resolve(response)
     })
 }
 

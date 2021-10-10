@@ -5,15 +5,18 @@ import NoWalletsFound from './home/NoWalletsFound';
 import GenerateWallet from './home/GenerateWallet';
 import UnlockWallet from './home/UnlockWallet';
 import ShowWallet from './home/ShowWallet';
-import { generateWalletWithKeyAndMnemonic, getXRDUSDBalances, saveWalletForLocalProvider, unlockWallet } from './utils/utils';
+import { 
+    generateWalletWithKeyAndMnemonic,
+    getXRDUSDBalances,
+    saveWalletForProvider,
+    unlockWallet,
+    getStakedPositions
+} from './utils/utils';
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
-import { AccountAddressT, AccountT, Amount, RadixT, MnemomicT, WalletT as RadixWalletT } from '@radixdlt/application';
+import { AccountT,WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
-import Key from '../classes/key';
-import { getCurrentXRDUSDValue, getWalletBalance } from './utils/background';
-import BigNumber from "bignumber.js"
 
 interface ICerbieProps {
 }
@@ -29,6 +32,7 @@ interface ICerbieState {
 
     onPasswordChange: Function;
     onMnemonicChange: Function;
+    onAddressChange: Function;
     onCreateWallet: Function;
     onCompleteWallet: Function;
     onUnlockWallet: Function;
@@ -50,13 +54,27 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
 
             onPasswordChange: (event: any) => { this.setState((state) => ({ ...state, wallet: { ...state.wallet, password: event.target.value } })) },
             onMnemonicChange: (mnemonic: string) => { let key = Wallet.newKeyWithMnemonic(mnemonic); this.setState((state) => ({ ...state, wallet: { ...state.wallet, key: ('phrase' in key.mnemonic ? key : undefined) } })); return ('phrase' in key.mnemonic) },
+            onAddressChange: (index: number) => {
+                return new Promise(async (resolve) => {
+                    await this.state.provider.saveViewingAddress(index)
+                    const isNewHigh = ((index+1) > this.state.wallet.addresses)
+                    this.setState((state) => ({...state, wallet: {
+                        ...state.wallet,
+                        addresses: (isNewHigh ? (index+1) : state.wallet.addresses),
+                        selectedAddress: (isNewHigh ? (index+1) : state.wallet.selectedAddress)
+                    }}))
 
-            onCreateWallet: () => { saveWalletForLocalProvider(this.state.wallet, this.state.provider) },
+                    if(isNewHigh)
+                        this.refreshWalletAddresses()
+                    resolve(true)
+                    this.refreshWalletInfo()
+                })
+            },
+
+            onCreateWallet: () => { saveWalletForProvider(this.state.wallet, this.state.provider) },
             onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, resetting: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
-
             onUnlockWallet: async () => {
                 let radixWallet: RadixWalletT
-                let radixPublicAddresses: AccountT[] = []
                 try {
                     radixWallet = await unlockWallet(this.state.wallet)
                 }
@@ -65,22 +83,9 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     return
                 }
                 // Unlock
-                this.setState((state) => ({ ...state, wallet: { ...state.wallet, unlocked: true } }))
-
-                // Public Addresses
-                radixWallet.deriveNextLocalHDAccount()
-                radixWallet.observeAccounts().forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
-
-                // Balances
-                let balances = await getXRDUSDBalances(radixPublicAddresses)
-                this.setState((state) => ({
-                    ...state, wallet: {
-                        ...state.wallet,
-                        radixWallet: radixWallet,
-                        radixPublicAddresses: radixPublicAddresses,
-                        radixBalances: balances
-                    }
-                }))
+                this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixWallet: radixWallet, unlocked: true } }))
+                this.refreshWalletAddresses()
+                this.refreshWalletInfo()
             }
         }
     }
@@ -102,7 +107,28 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async refreshWallet() {
         this.setState((state) => ({ ...state, loading: true }))
         let wallet = await this.state.provider.getWallet();
-        this.setState((state) => ({ ...state, wallet: wallet, loading: false }))
+        this.setState((state) => ({ ...state, wallet: { ...wallet }, loading: false }))
+    }
+    
+    async refreshWalletInfo() {
+        let addresses = this.state.wallet.radixPublicAddresses
+
+        for(let i = 0; i < addresses.length; i++) {
+            let address = addresses[i]
+            let balances = await getXRDUSDBalances([address])
+            let stakes = await getStakedPositions([address])
+
+            this.state.wallet.radixBalances.push(balances[0])
+            this.state.wallet.radixStakes.push(stakes[0])
+            this.setState((state) => ({ ...state }))
+        }
+    }
+    
+    refreshWalletAddresses() {
+        let radixPublicAddresses: AccountT[] = []
+        let restored = this.state.wallet.radixWallet?.restoreLocalHDAccountsToIndex(this.state.wallet.addresses)
+        restored?.forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
+        this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixPublicAddresses: radixPublicAddresses } }))
     }
 
     render(): ReactNode {
@@ -152,7 +178,8 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     }
                     {this.state.wallet.unlocked &&
                         <ShowWallet
-                            wallet={this.state.wallet}>
+                            wallet={this.state.wallet}
+                            onAddressChange={this.state.onAddressChange}>
                         </ShowWallet>
                     }
                 </div>

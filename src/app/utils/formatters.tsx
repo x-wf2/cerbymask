@@ -8,7 +8,7 @@ BigNumber.set({
 })
 
 export function formatAddress(address: string) {
-    return `${address.substring(0, 3)}..${address.substring(address.length - 16)}`
+    return `${address.substring(0, 3)}..${address.substring(address.length - 20)}`
 }
 
 export const formatBalance = (amount: AmountT, showFull = false): string => {

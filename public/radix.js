@@ -6,8 +6,20 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     else if (request.title == "get-xrdusd-value") {
         handleGetXRDUSDValue(request, reply)
     }
+    else if (request.title == "get-staked-positions") {
+        handleStakedPositions(request, reply)
+    }
     return true;
 });
+
+async function handleStakedPositions(request, reply) {
+    const address = request.data.address
+    
+    const rawResponse = await getData("account.get_stake_positions", { "address": address })
+    const content = await rawResponse.json();
+
+    reply(content)
+}
 
 async function handleGetXRDUSDValue(request, reply) {
     const rawResponse = await fetch('https://api.bitfinex.com/v1/pubticker/xrdusd', {})
@@ -25,9 +37,9 @@ async function handleGetWalletFunds(request, reply) {
     reply(xrdBalances)
 }
 
-async function getData(method, params) {
+async function getData(method, params, endpoint="archive") {
     const payload = { "jsonrpc": "1.0", "id": "curltest", "method": method, "params":  params}
-    const rawResponse = await fetch('https://mainnet.radixdlt.com/archive', {
+    const rawResponse = await fetch(`https://mainnet.radixdlt.com/${endpoint}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
