@@ -16,6 +16,19 @@ export default function ForgotPassword(props: any) {
         setSeedSaved(changed)
     }
 
+    function onPaste(e: any) {
+        e.preventDefault()
+        let raw = e.clipboardData.getData("text/plain")
+        let phrase = raw.replace(/\n/g," ").split(" ")
+        console.log(raw)
+        console.log(phrase)
+        let fields = document.getElementsByClassName("mnemonic-input-word");
+        for(let i = 0; i < fields.length; i++) {
+            let field = fields[i] as HTMLInputElement
+            field.value = phrase[i]
+        }
+    }
+
     return (
         <div style={{ overflowX: "auto" }}>
             {!seedSaved &&
@@ -24,18 +37,18 @@ export default function ForgotPassword(props: any) {
                     <div className="warn-content-wrapper">
                         <p className="warn-save-text">Please insert the seed phrase you wish to load:</p>
                         <div className="mnemonic-input-container">
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
-                            <input className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
+                            <input onPaste={(e) => {onPaste(e)}} className="mnemonic-input-word" type="text"></input>
                         </div>
                     </div>
                     <div className="warn-content-actions">
