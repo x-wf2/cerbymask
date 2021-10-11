@@ -33,23 +33,40 @@
 }
 
 .show-wallet-main-action-button {
+    border: 0;
+    background-color: transparent;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: flex;
     cursor: pointer;
-    width: 52px;
-    height: 52px;
+    transition: 0.225s color;
+    color: rgb(0, 48, 87, 0.7);
+    width: 16%;
+}
+
+.show-wallet-main-action-circle {
+    width: 36px;
+    height: 36px;
     border: 0;
     border-radius: 50%;
     background-color: rgb(0, 48, 87, 0.5);
     color: #f2f2fc;
     font-size: 11px;
+    display: flex;
+    justify-content: center;
     transition: 0.225s background-color;
 }
 
 .show-wallet-main-action-button:hover {
+    color: rgb(0, 48, 87, 1);
+}
+.show-wallet-main-action-button:hover .show-wallet-main-action-circle {
     background-color: #00c389;
 }
 
 .show-wallet-charts {
-    margin-top: 30px;
+    margin-top: 13px;
     display:flex;
     flex-wrap: wrap;
     row-gap: 10px;
@@ -83,8 +100,9 @@
     margin-left: 10px;
     color: gray;
     transition: 0.325s color;
+    cursor: pointer;
 }
 
 .show-wallet-choose-address-copy:hover {
-    color: rgb(0, 48, 87, 0.5);;
+    color: rgb(0, 48, 87, 0.5);
 }

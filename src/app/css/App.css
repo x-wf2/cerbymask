@@ -1,11 +1,11 @@
 @font-face {
-  font-family: 'IBM Plex Sans';
-  src: local('IBM Plex Sans'), url(../font/IBM_Plex_Sans/IBMPlexSans-Medium.ttf) format('truetype');
+  font-family: "IBM Plex Sans";
+  src: local("IBM Plex Sans"), url(../font/IBM_Plex_Sans/IBMPlexSans-Medium.ttf) format("truetype");
 }
 
 @font-face {
-  font-family: 'IBM Plex Sans';
-  src: local('IBM Plex Sans'), url(../font/IBM_Plex_Sans/IBMPlexSans-Bold.ttf) format('truetype');
+  font-family: "IBM Plex Sans";
+  src: local("IBM Plex Sans"), url(../font/IBM_Plex_Sans/IBMPlexSans-Bold.ttf) format("truetype");
   font-weight: bold;
 }
 
@@ -16,16 +16,16 @@ select:focus {
 }
 
 button {
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 .App {
   text-align: center;
   background-color: rgba(255, 255, 255, 0.9);
   color: #282c34;
   min-height: 100vh;
-  display:flex;
+  display: flex;
   flex-direction: column;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
 .App-header {
@@ -177,4 +177,59 @@ button {
 
 .strong-1 {
   font-weight: bold;
+}
+.normal-1 {
+  font-weight: 400;
+}
+
+.hidden {
+  display: none;
+}
+
+.blur {
+  filter: blur(10px);
+  z-index: 0;
+}
+
+.modal-form {
+  filter: drop-shadow(0 0px 5px rgba(0,48,87,0.3));
+  position: absolute;
+  width: 304.4px;
+  padding-bottom: 16px;
+  background: rgba(255, 255, 255, 1);
+  top: 206px;
+  z-index: 1;
+  left: 36px;
+  border: 1px solid rgb(0, 48, 87, 0.1);
+  min-height: 22px;
+}
+
+.modal-form-column-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-form-column-centered h2 {
+  margin-top: 22px;
+  font-size: 14px;
+}
+
+.modal-form-icon {
+  margin-top: 4px;
+}
+
+.modal-close {
+  position: absolute;
+  width: 19px;
+  left: 11px;
+  top: 10px;
+  cursor: pointer;
+}
+
+.modal-form-container {
+  padding-top: 13px;
+  padding-left: 22px;
+  padding-right: 22px;
+  word-break: break-all;
 }

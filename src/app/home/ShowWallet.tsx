@@ -1,7 +1,10 @@
-import React, { useState } from "react"
+import React, { ReactNode, useState } from "react"
 import "../css/ShowWallet.css"
 import { formatAddress, formatBalance } from "../utils/formatters"
 import { Copy } from "@styled-icons/fa-regular"
+import { PaperPlane, LockAlt } from "@styled-icons/boxicons-regular"
+import { Download } from "@styled-icons/boxicons-solid"
+import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS } from "./ShowModal"
 
 export function WalletChart(props: any) {
     return (
@@ -31,10 +34,6 @@ export default function ShowWallet(props: any) {
     async function onAddressChange(event: any) {
         let selected = parseInt(event.target.value)
         await props.onAddressChange(selected)
-        console.log("selected")
-        console.log(selected)
-        console.log("wallet")
-        console.log(props.wallet)
         setSelected(selected)
     }
 
@@ -63,14 +62,30 @@ export default function ShowWallet(props: any) {
             </div>
             <div className="show-wallet-main-actions">
                 <div className="show-wallet-main-actions-buttons">
-                    <button type="button" className="show-wallet-main-action-button">Receive</button>
-                    <button type="button" className="show-wallet-main-action-button">Send</button>
+                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_RECEIVE_FUNDS)}>
+                        <div className="show-wallet-main-action-circle">
+                            <Download width="16px"/>
+                        </div>
+                        Receive
+                    </button>
+                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
+                        <div className="show-wallet-main-action-circle">
+                            <PaperPlane width="16px"/>
+                        </div>
+                        Send
+                    </button>
+                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
+                        <div className="show-wallet-main-action-circle">
+                            <LockAlt width="16px"/>
+                        </div>
+                        Stake
+                    </button>
                 </div>
             </div>
             <div className="show-wallet-charts">
-                <WalletChart title="Initial" value={"-"} />
+                {/* <WalletChart title="Initial" value={"-"} />
                 <WalletChart title="Rewards" value={"-"} />
-                <WalletChart title="Unstaking" value={"-"} />
+                <WalletChart title="Unstaking" value={"-"} /> */}
 
                 {/* Staked */}
                 {selected <= (props.wallet.radixBalances.length-1) && props.wallet.radixStakes.length > 0 &&

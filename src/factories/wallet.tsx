@@ -49,19 +49,12 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             chrome.storage.local.set({ "keystore": keystore }, () => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
-
-                chrome.storage.local.set({ "seed": wallet.key?.mnemonic.phrase }, () => {
-                    const error = chrome.runtime.lastError;
-                    if (error) return reject(error)
-                    resolve()
-                })
             });
         });
     }
     newWallet(): Promise<Wallet> {
         return new Promise<Wallet>(async (resolve) => {
             await chrome.storage.local.set({ "keystore": undefined });
-            await chrome.storage.local.set({ "seed": undefined });
             await chrome.storage.local.set({ "address": 0 });
             await chrome.storage.local.set({ "addresses": 2 });
             resolve(new Wallet())
@@ -78,29 +71,18 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
                     if (error || typeof keystore["keystore"] === 'undefined') throw Error
 
                     // Seed
-                    chrome.storage.local.get(["seed"], async (seed) => {
-                        try {
-                            const error = chrome.runtime.lastError;
-                            if (error) throw Error
-                            chrome.storage.local.get(["address"], async (address) => {
-                                chrome.storage.local.get(["addresses"], async (addresses) => {
-                                    wallet = new Wallet()
-                                    wallet.key = Wallet.newKey()
+                    chrome.storage.local.get(["address"], async (address) => {
+                        chrome.storage.local.get(["addresses"], async (addresses) => {
+                            wallet = new Wallet()
+                            wallet.key = Wallet.newKey()
 
-                                    wallet.key.keystore = keystore["keystore"]
-                                    wallet.key.mnemonic = seed["seed"]
-                                    wallet.selectedAddress = address["address"]
-                                    wallet.addresses = addresses["addresses"]
+                            wallet.key.keystore = keystore["keystore"]
+                            wallet.selectedAddress = address["address"]
+                            wallet.addresses = addresses["addresses"]
 
-                                    console.log(wallet)
-                                    resolve(wallet)
-                                })
-                            })
-                        }
-                        catch (e) {
-                            wallet = await this.newWallet()
+                            console.log(wallet)
                             resolve(wallet)
-                        }
+                        })
                     })
                 }
                 catch (e) {

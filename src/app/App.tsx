@@ -5,6 +5,7 @@ import NoWalletsFound from './home/NoWalletsFound';
 import GenerateWallet from './home/GenerateWallet';
 import UnlockWallet from './home/UnlockWallet';
 import ShowWallet from './home/ShowWallet';
+import ShowModal from './home/ShowModal';
 import { 
     generateWalletWithKeyAndMnemonic,
     getXRDUSDBalances,
@@ -29,6 +30,8 @@ interface ICerbieState {
     loading: boolean;
     generating: boolean;
     resetting: boolean;
+    showingModal: boolean;
+    showingForm: number;
 
     onPasswordChange: Function;
     onMnemonicChange: Function;
@@ -51,6 +54,8 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             loading: true,
             generating: false,
             resetting: false,
+            showingModal: false,
+            showingForm: 0,
 
             onPasswordChange: (event: any) => { this.setState((state) => ({ ...state, wallet: { ...state.wallet, password: event.target.value } })) },
             onMnemonicChange: (mnemonic: string) => { let key = Wallet.newKeyWithMnemonic(mnemonic); this.setState((state) => ({ ...state, wallet: { ...state.wallet, key: ('phrase' in key.mnemonic ? key : undefined) } })); return ('phrase' in key.mnemonic) },
@@ -61,7 +66,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     this.setState((state) => ({...state, wallet: {
                         ...state.wallet,
                         addresses: (isNewHigh ? (index+1) : state.wallet.addresses),
-                        selectedAddress: (isNewHigh ? (index+1) : state.wallet.selectedAddress)
+                        selectedAddress: (index)
                     }}))
 
                     if(isNewHigh)
@@ -123,6 +128,13 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             this.setState((state) => ({ ...state }))
         }
     }
+
+    async showModal(type: number) {
+        this.setState((state) => ({ ...state, showingModal: true, showingForm: type }))
+    }
+    async closeModal() {
+        this.setState((state) => ({ ...state, showingModal: false }))
+    }
     
     refreshWalletAddresses() {
         let radixPublicAddresses: AccountT[] = []
@@ -140,7 +152,12 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                         CerbiMask
                     </p>
                 </header>
-                <div className="App-body">
+                <ShowModal
+                    wallet={this.state.wallet}
+                    showingModal={this.state.showingModal}
+                    showingForm={this.state.showingForm}
+                    closeModal={() => this.closeModal()}/>
+                <div className={`App-body ${this.state.showingModal ? 'blur' : ''}`}>
                     {this.state.loading &&
                         <p>Loading</p>
                     }
@@ -179,7 +196,9 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     {this.state.wallet.unlocked &&
                         <ShowWallet
                             wallet={this.state.wallet}
-                            onAddressChange={this.state.onAddressChange}>
+                            onAddressChange={this.state.onAddressChange}
+                            showModal={(type: number) => this.showModal(type)}
+                            closeModal={() => this.closeModal()}>
                         </ShowWallet>
                     }
                 </div>
