@@ -46,8 +46,8 @@
 }
 
 .show-wallet-main-action-circle {
-    width: 36px;
-    height: 36px;
+    width: 36px!important;
+    height: 36px!important;
     border: 0;
     border-radius: 50%;
     background-color: rgb(0, 48, 87, 0.5);
@@ -56,6 +56,10 @@
     display: flex;
     justify-content: center;
     transition: 0.225s background-color;
+}
+.small-circle {
+    width: 26px!important;
+    height: 26px!important;
 }
 
 .show-wallet-main-action-button:hover {
@@ -70,10 +74,6 @@
     display:flex;
     flex-wrap: wrap;
     row-gap: 10px;
-}
-
-.show-wallet-charts div {
-    width: 33.33%;
 }
 
 .show-wallet-chart-container {
@@ -105,4 +105,26 @@
 
 .show-wallet-choose-address-copy:hover {
     color: rgb(0, 48, 87, 0.5);
+}
+
+.show-tokens-container {
+    display: flex;
+    justify-content: center;
+    column-gap: 10px;
+    width: 100%;
+}
+
+.show-tokens-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.show-tokens-wrapper div {
+    width: 31%;
+}
+
+.show-wallet-eq-balance span {
+    margin-top: 4px;
 }

@@ -9,8 +9,20 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     else if (request.title == "get-staked-positions") {
         handleStakedPositions(request, reply)
     }
+    else if (request.title == "get-token-info") {
+        handleGetTokenInfo(request, reply)
+    }
     return true;
 });
+
+async function handleGetTokenInfo(request, reply) {
+    const rri = request.data.rri
+    
+    const rawResponse = await getData("tokens.get_info", { "rri": rri })
+    const content = await rawResponse.json();
+
+    reply(content)
+}
 
 async function handleStakedPositions(request, reply) {
     const address = request.data.address
@@ -31,10 +43,9 @@ async function handleGetWalletFunds(request, reply) {
     const address = request.data.address
     
     const rawResponse = await getData("account.get_balances", { "address": address })
-    const content = await rawResponse.json();
+    const content = await rawResponse.json()
 
-    const xrdBalances = content.result.tokenBalances.filter((item) => {return item.rri == "xrd_rr1qy5wfsfh"})
-    reply(xrdBalances)
+    reply(content.result.tokenBalances)
 }
 
 async function getData(method, params, endpoint="archive") {

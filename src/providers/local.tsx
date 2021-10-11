@@ -26,6 +26,7 @@ export interface Provider {
     getInstance(): RadixT;
     saveViewingAddress(index: number): Promise<void>;
     getViewingAddress(): Promise<number>;
+    restoreViewingAddress(): Promise<number>;
 }
 
 export class LocalProvider implements Provider {
@@ -41,6 +42,9 @@ export class LocalProvider implements Provider {
         this.radix = Radix.create()
 
         this.networkFactory.newNetwork("MAINNET", "https://mainnet.radixdlt.com")
+    }
+    restoreViewingAddress(): Promise<number> {
+        throw this.walletFactory.restoreViewingAddress()
     }
 
     getViewingAddress(): Promise<number> {

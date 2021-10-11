@@ -8,9 +8,17 @@ export interface WalletFactoryInterface {
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void>;
     saveViewingAddress(index: number): Promise<void>;
     getViewingAddress(): Promise<number>;
+    restoreViewingAddress(): Promise<void>;
 }
 
 export default class LocalWalletFactory implements WalletFactoryInterface {
+    restoreViewingAddress(): Promise<void> {
+        return new Promise((resolve) => {
+            chrome.storage.local.set({ "addresses": 2 })
+            chrome.storage.local.set({ "address": 0 })
+            resolve()
+        })
+    }
     getViewingAddress(): Promise<number> {
         return new Promise((resolve) => {
             chrome.storage.local.get(["address"], async (address) => {

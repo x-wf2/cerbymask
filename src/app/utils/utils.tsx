@@ -1,8 +1,8 @@
-import { Wallet, WalletBalanceT, WalletStakeT } from "../../classes/wallet"
+import { Wallet, WalletBalanceT, WalletStakeT, WalletTokensT } from "../../classes/wallet"
 import { MnemomicT, KeystoreT, SigningKeychain, SigningKeychainT, Wallet as RadixWallet, WalletT as RadixWalletT, Network as RadixNetwork, AccountT } from '@radixdlt/application'
 import { Provider } from "../../providers/local";
 import { resolve } from "path";
-import { getCurrentXRDUSDValue, getWalletBalance, getStakedPositions as gsp } from "./background";
+import { getCurrentXRDUSDValue, getWalletBalance, getStakedPositions as gsp, getAddressTokens } from "./background";
 import BigNumber from "bignumber.js"
 import { formatBigNumber, numberFormatUSA } from "./formatters";
 
@@ -68,9 +68,20 @@ export async function getXRDUSDBalances(radixPublicAddresses: AccountT[]) {
     }))
 }
 
+export async function getTokenBalances(radixPublicAddresses: AccountT[]) {
+    return Promise.all(radixPublicAddresses.map(async (account: AccountT) => {
+        let address = account.address.toString()
+        let response = await getAddressTokens(address)
+        let result = {
+            address: address,
+            tokens: response
+        } as WalletTokensT
+        return result
+    }))
+}
+
 export async function getStakedPositions(radixPublicAddresses: AccountT[]) {
     let xrdValue = (await getCurrentXRDUSDValue())
-
     return Promise.all(radixPublicAddresses.map(async (address) => {
         let staked = (await gsp(address?.address.toString())).result
 
@@ -78,7 +89,7 @@ export async function getStakedPositions(radixPublicAddresses: AccountT[]) {
         let usdBalance = ""
         if(balance) {
             usdBalance = balance.multipliedBy(parseFloat(xrdValue.bid)).shiftedBy(-18).toFixed(4)
-            balance = balance.shiftedBy(-18).toFixed(4)
+            balance = formatBigNumber(balance.shiftedBy(-18))
         }
         return { 
             address: address?.address.toString(),

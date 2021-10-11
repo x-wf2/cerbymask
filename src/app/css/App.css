@@ -178,8 +178,13 @@ button {
 .strong-1 {
   font-weight: bold;
 }
+
 .normal-1 {
   font-weight: 400;
+}
+
+.no-margin {
+  margin: 0;
 }
 
 .hidden {
@@ -191,6 +196,12 @@ button {
   z-index: 0;
 }
 
+.centered-flex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 .modal-form {
   filter: drop-shadow(0 0px 5px rgba(0,48,87,0.3));
   position: absolute;
@@ -227,9 +238,18 @@ button {
   cursor: pointer;
 }
 
+.w-100 {
+  width: 100%!important;
+}
+
+.blue-text {
+  color: #003057;
+}
+
 .modal-form-container {
   padding-top: 13px;
   padding-left: 22px;
   padding-right: 22px;
   word-break: break-all;
 }
+

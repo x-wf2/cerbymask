@@ -6,17 +6,18 @@ import GenerateWallet from './home/GenerateWallet';
 import UnlockWallet from './home/UnlockWallet';
 import ShowWallet from './home/ShowWallet';
 import ShowModal from './home/ShowModal';
-import { 
+import {
     generateWalletWithKeyAndMnemonic,
     getXRDUSDBalances,
     saveWalletForProvider,
     unlockWallet,
-    getStakedPositions
+    getStakedPositions,
+    getTokenBalances,
 } from './utils/utils';
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
-import { AccountT,WalletT as RadixWalletT } from '@radixdlt/application';
+import { AccountT, WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
 
 interface ICerbieProps {
@@ -62,21 +63,23 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             onAddressChange: (index: number) => {
                 return new Promise(async (resolve) => {
                     await this.state.provider.saveViewingAddress(index)
-                    const isNewHigh = ((index+1) > this.state.wallet.addresses)
-                    this.setState((state) => ({...state, wallet: {
-                        ...state.wallet,
-                        addresses: (isNewHigh ? (index+1) : state.wallet.addresses),
-                        selectedAddress: (index)
-                    }}))
+                    const isNewHigh = ((index + 1) > this.state.wallet.addresses)
+                    this.setState((state) => ({
+                        ...state, wallet: {
+                            ...state.wallet,
+                            addresses: (isNewHigh ? (index + 1) : state.wallet.addresses),
+                            selectedAddress: (index)
+                        }
+                    }))
 
-                    if(isNewHigh)
+                    if (isNewHigh)
                         this.refreshWalletAddresses()
                     resolve(true)
                     this.refreshWalletInfo()
                 })
             },
 
-            onCreateWallet: () => { saveWalletForProvider(this.state.wallet, this.state.provider) },
+            onCreateWallet: () => { saveWalletForProvider(this.state.wallet, this.state.provider); this.state.provider.restoreViewingAddress() },
             onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, resetting: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
             onUnlockWallet: async () => {
                 let radixWallet: RadixWalletT
@@ -114,19 +117,26 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         let wallet = await this.state.provider.getWallet();
         this.setState((state) => ({ ...state, wallet: { ...wallet }, loading: false }))
     }
-    
+
     async refreshWalletInfo() {
         let addresses = this.state.wallet.radixPublicAddresses
 
-        for(let i = 0; i < addresses.length; i++) {
-            let address = addresses[i]
-            let balances = await getXRDUSDBalances([address])
-            let stakes = await getStakedPositions([address])
+        let balances = await getXRDUSDBalances(addresses)
+        let tokens = await getTokenBalances(addresses)
+        let stakes = await getStakedPositions(addresses)
+        
+        this.state.wallet.radixBalances = balances
+        this.state.wallet.radixStakes = stakes
 
-            this.state.wallet.radixBalances.push(balances[0])
-            this.state.wallet.radixStakes.push(stakes[0])
-            this.setState((state) => ({ ...state }))
-        }
+        this.setState((state) => ({ 
+            ...state,
+            wallet: {
+                ...state.wallet,
+                radixBalances: balances,
+                radixStakes: stakes,
+                radixTokens: tokens
+            }
+        }))
     }
 
     async showModal(type: number) {
@@ -135,7 +145,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async closeModal() {
         this.setState((state) => ({ ...state, showingModal: false }))
     }
-    
+
     refreshWalletAddresses() {
         let radixPublicAddresses: AccountT[] = []
         let restored = this.state.wallet.radixWallet?.restoreLocalHDAccountsToIndex(this.state.wallet.addresses)
@@ -156,7 +166,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     wallet={this.state.wallet}
                     showingModal={this.state.showingModal}
                     showingForm={this.state.showingForm}
-                    closeModal={() => this.closeModal()}/>
+                    closeModal={() => this.closeModal()} />
                 <div className={`App-body ${this.state.showingModal ? 'blur' : ''}`}>
                     {this.state.loading &&
                         <p>Loading</p>

@@ -20,8 +20,6 @@ export default function ForgotPassword(props: any) {
         e.preventDefault()
         let raw = e.clipboardData.getData("text/plain")
         let phrase = raw.replace(/\n/g," ").split(" ")
-        console.log(raw)
-        console.log(phrase)
         let fields = document.getElementsByClassName("mnemonic-input-word");
         for(let i = 0; i < fields.length; i++) {
             let field = fields[i] as HTMLInputElement

@@ -1,10 +1,39 @@
 import React, { ReactNode, useState } from "react"
 import "../css/ShowWallet.css"
-import { formatAddress, formatBalance } from "../utils/formatters"
+import { formatAddress, formatBalance, formatBigNumber } from "../utils/formatters"
 import { Copy } from "@styled-icons/fa-regular"
-import { PaperPlane, LockAlt } from "@styled-icons/boxicons-regular"
+import { PaperPlane, LockAlt, DollarCircle } from "@styled-icons/boxicons-regular"
 import { Download } from "@styled-icons/boxicons-solid"
-import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS } from "./ShowModal"
+import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS, TYPE_STAKE_FUNDS } from "./ShowModal"
+import BigNumber from "bignumber.js"
+
+export function TokensSection(props: any) {
+    return (
+        <div className="show-wallet-chart-container" style={{ width: "100%" }}>
+            {props.icon && props.icon}
+            <p className="show-wallet-chart-title">
+                Your Tokens
+            </p>
+            <div className="show-tokens-wrapper">
+                {props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens.map((tokenInfo: any) => {
+                    return (
+                        <div className="show-tokens-container">
+                            <p className={`show-wallet-eq-balance w-100 centered-flex position-fix small blue-text`}>
+                                <div className="show-wallet-main-action-circle small-circle">
+                                    <DollarCircle width="16px" />
+                                </div>
+                                <span>
+                                    {formatBigNumber(new BigNumber(tokenInfo.amount).shiftedBy(-18))}
+                                    &nbsp;{tokenInfo.tokenInfo.symbol}
+                                </span>
+                            </p>
+                        </div>
+                    )
+                })}
+            </div>
+        </div >
+    )
+}
 
 export function WalletChart(props: any) {
     return (
@@ -47,16 +76,16 @@ export default function ShowWallet(props: any) {
                         })}
                         <option value={props.wallet.radixPublicAddresses && props.wallet.radixPublicAddresses.length}>New Address...</option>
                     </select>
-                    <Copy className="show-wallet-choose-address-copy" width="12px"/>
+                    <Copy className="show-wallet-choose-address-copy" width="12px" />
                 </div>
                 <p className="show-wallet-balance">
-                    {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length-1)) && `0`}
-                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length-1) && props.wallet.radixBalances[selected].xrd != undefined && formatBalance(props.wallet.radixBalances[selected].xrd?.value)}
+                    {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length - 1)) && `0`}
+                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length - 1) && props.wallet.radixBalances[selected].xrd != undefined && formatBalance(props.wallet.radixBalances[selected].xrd?.value)}
                     &nbsp;XRD
                 </p>
                 <p className="show-wallet-eq-balance">
-                    {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length-1)) && `$0`}
-                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length-1) && props.wallet.radixBalances[selected] && `$${props.wallet.radixBalances[selected].balance}`}
+                    {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length - 1)) && `$0`}
+                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length - 1) && props.wallet.radixBalances[selected] && `$${props.wallet.radixBalances[selected].balance}`}
                     &nbsp;USD
                 </p>
             </div>
@@ -64,40 +93,39 @@ export default function ShowWallet(props: any) {
                 <div className="show-wallet-main-actions-buttons">
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_RECEIVE_FUNDS)}>
                         <div className="show-wallet-main-action-circle">
-                            <Download width="16px"/>
+                            <Download width="16px" />
                         </div>
                         Receive
                     </button>
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
                         <div className="show-wallet-main-action-circle">
-                            <PaperPlane width="16px"/>
+                            <PaperPlane width="16px" />
                         </div>
                         Send
                     </button>
-                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
+                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_STAKE_FUNDS)}>
                         <div className="show-wallet-main-action-circle">
-                            <LockAlt width="16px"/>
+                            <LockAlt width="16px" />
                         </div>
                         Stake
                     </button>
                 </div>
             </div>
             <div className="show-wallet-charts">
-                {/* <WalletChart title="Initial" value={"-"} />
-                <WalletChart title="Rewards" value={"-"} />
-                <WalletChart title="Unstaking" value={"-"} /> */}
-
                 {/* Staked */}
-                {selected <= (props.wallet.radixBalances.length-1) && props.wallet.radixStakes.length > 0 &&
+                {selected <= (props.wallet.radixBalances.length - 1) && props.wallet.radixStakes.length > 0 &&
                     <WalletChart
-                        title="Staked"
+                        title="Your Stake"
                         value={props.wallet.radixStakes[selected].staked}
                         value2={props.wallet.radixStakes[selected].balance}
                         full={true} />}
-                {(selected > (props.wallet.radixBalances.length-1) || props.wallet.radixStakes.length == 0) &&
+                {(selected > (props.wallet.radixBalances.length - 1) || props.wallet.radixStakes.length == 0) &&
                     <WalletChart
-                        title="Staked"
+                        title="Your Stake"
                         value={0} full={true} />}
+
+                {/* Tokens */}
+                <TokensSection wallet={props.wallet} />
             </div>
         </div>
     )
