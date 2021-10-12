@@ -1,5 +1,7 @@
 import React, { useEffect } from "react"
 
+import cerbie from "../img/cerbie.png"
+
 export default function UnlockWallet(props: any) {
     return (
         <div style={{ overflowX: "auto" }}>

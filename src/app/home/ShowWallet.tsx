@@ -15,6 +15,18 @@ export function TokensSection(props: any) {
                 Your Tokens
             </p>
             <div className="show-tokens-wrapper">
+                {(props.wallet.radixTokens.length == 0 || props.wallet.selectedAddress >= props.wallet.radixTokens.length || props.wallet.radixTokens[props.wallet.selectedAddress].tokens.length == 0) &&
+                    <div className="show-tokens-container">
+                        <p className={`show-wallet-eq-balance w-100 centered-flex position-fix small blue-text`}>
+                            <div className="show-wallet-main-action-circle small-circle">
+                                <DollarCircle width="16px" />
+                            </div>
+                            <span>
+                                No Tokens :(
+                            </span>
+                        </p>
+                    </div>
+                }
                 {props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens.map((tokenInfo: any) => {
                     return (
                         <div className="show-tokens-container">

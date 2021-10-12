@@ -93,7 +93,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 // Unlock
                 this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixWallet: radixWallet, unlocked: true } }))
                 this.refreshWalletAddresses()
-                this.refreshWalletInfo()
+                await this.refreshWalletInfo()
             }
         }
     }
@@ -124,11 +124,11 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         let balances = await getXRDUSDBalances(addresses)
         let tokens = await getTokenBalances(addresses)
         let stakes = await getStakedPositions(addresses)
-        
+
         this.state.wallet.radixBalances = balances
         this.state.wallet.radixStakes = stakes
 
-        this.setState((state) => ({ 
+        this.setState((state) => ({
             ...state,
             wallet: {
                 ...state.wallet,

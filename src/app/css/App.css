@@ -50,6 +50,20 @@ button {
   width: 121px;
 }
 
+.App-cerbie-logo-container {
+  position: absolute;
+  left: 122px;
+  top: 31px;
+}
+
+.App-cerbie-logo-circle {
+  left: 26px;
+  height: 74px;
+  border-radius: 48%;
+  overflow: hidden;
+  filter: drop-shadow(0px 0px 7px rgba(0, 0, 0, 0.3));
+}
+
 .App-body {
   display: flex;
   align-items: center;
@@ -187,6 +201,10 @@ button {
   margin: 0;
 }
 
+.margin-t-1 {
+  margin-top: 19px;
+}
+
 .hidden {
   display: none;
 }
@@ -195,7 +213,11 @@ button {
   filter: blur(10px);
   z-index: 0;
 }
-
+.centered-flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 .centered-flex {
   display: flex;
   flex-direction: column;
@@ -203,7 +225,7 @@ button {
   align-items: center;
 }
 .modal-form {
-  filter: drop-shadow(0 0px 5px rgba(0,48,87,0.3));
+  filter: drop-shadow(0 0px 5px rgba(0, 48, 87, 0.3));
   position: absolute;
   width: 304.4px;
   padding-bottom: 16px;
@@ -238,8 +260,8 @@ button {
   cursor: pointer;
 }
 
-.w-100 {
-  width: 100%!important;
+.w-100  {
+  width: 100% !important;
 }
 
 .blue-text {
@@ -253,3 +275,10 @@ button {
   word-break: break-all;
 }
 
+.full-height {
+  min-height: 37.5rem;
+}
+
+.send-funds-top {
+  top: 144px;
+}
