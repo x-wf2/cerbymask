@@ -4,9 +4,13 @@
     <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Wallet</p>
 </p>
 
-# Features
-- Chrome based extension
-- Lightweight wallet (~8mb)
+# 🚀 Features
+- Fully Chrome Based Extension
+- Lightweight (~4mb)
+- Full seed phrase backup and recovery management
+- Complete Token Asset management
+- Multiple Public Addresses management
+- Realtime USD for balance and stake
 
 # Getting Started 
 
