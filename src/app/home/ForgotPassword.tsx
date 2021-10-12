@@ -28,11 +28,6 @@ export default function ForgotPassword(props: any) {
             for(let i = 0; i < fields.length; i++) {
                 let field = fields[i] as HTMLInputElement
 
-                console.log("field")
-                console.log(field)
-                console.log("e.target")
-                console.log(e.target)
-
                 if(field === e.target)
                     filling = true
                 if(filling && phrase[phraseIndex]) {

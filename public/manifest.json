@@ -2,7 +2,7 @@
   "short_name": "CerbiMask",
   "name": "CerbiMask",
   "description": "A Radix Protocol Lightweight Wallet",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 3,
   "icons": {
     "16": "android-chrome-192x192.png",
