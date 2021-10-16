@@ -1,6 +1,6 @@
 <p align="center">
     <img src="public/android-chrome-512x512.png" style="width:200px;">
-    <h1 style="margin-top: -20px;text-align: center;border-bottom: none;">CerbiMask</h1>
+    <h1 style="margin-top: -20px;text-align: center;border-bottom: none;">CerbyMask</h1>
     <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Wallet</p>
 </p>
 

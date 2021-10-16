@@ -1,6 +1,6 @@
 {
-  "short_name": "CerbiMask",
-  "name": "CerbiMask",
+  "short_name": "CerbyMask",
+  "name": "CerbyMask",
   "description": "A Radix Protocol Lightweight Wallet",
   "version": "1.1",
   "manifest_version": 3,
@@ -11,7 +11,7 @@
   },
   "action": {
     "default_popup": "index.html",
-    "default_title": "CerbiMask - A Radix Protocol Lightweight Wallet"
+    "default_title": "CerbyMask - A Radix Protocol Lightweight Wallet"
   },
   "permissions": [
     "storage"

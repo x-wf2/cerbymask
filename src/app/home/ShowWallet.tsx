@@ -78,6 +78,11 @@ export default function ShowWallet(props: any) {
         setSelected(selected)
     }
 
+    function onCopyPublicAddress() {
+        let address = props.wallet.radixPublicAddresses[props.wallet.selectedAddress]
+        navigator.clipboard.writeText(address.address.toString())
+    }
+
     return (
         <div className="full-height-container" style={{ width: "100%", overflowX: "auto", wordBreak: "break-all" }}>
             <div className="show-wallet-header">
@@ -88,7 +93,7 @@ export default function ShowWallet(props: any) {
                         })}
                         <option value={props.wallet.radixPublicAddresses && props.wallet.radixPublicAddresses.length}>New Address...</option>
                     </select>
-                    <Copy className="show-wallet-choose-address-copy" width="12px" />
+                    <Copy onClick={onCopyPublicAddress} className="show-wallet-choose-address-copy" width="12px" />
                 </div>
                 <p className="show-wallet-balance">
                     {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length - 1)) && `0`}

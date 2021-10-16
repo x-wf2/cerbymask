@@ -1,6 +1,6 @@
 {
-  "name": "cerbimask",
-  "version": "0.1.0",
+  "name": "CerbyMask",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@radixdlt/account": "^3.0.0",

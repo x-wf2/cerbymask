@@ -127,7 +127,9 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
 
         this.state.wallet.radixBalances = balances
         this.state.wallet.radixStakes = stakes
+        this.state.wallet.radixTokens = tokens
 
+        console.log(this.state.wallet)
         this.setState((state) => ({
             ...state,
             wallet: {
@@ -159,7 +161,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 <header className="App-header">
                     <img className="App-cerbie-logo" src={cerbie}></img>
                     <p className="App-title">
-                        CerbiMask
+                        CerbyMask
                     </p>
                 </header>
                 <ShowModal

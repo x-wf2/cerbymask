@@ -1,3 +1,6 @@
+chrome.windows.onCreated.addListener(function() {
+    console.log("CerbyMask detected a new browser opening")
+})
 
 chrome.runtime.onMessage.addListener((request, sender, reply) => {
     if (request.title == "get-wallet-funds") {
@@ -8,6 +11,9 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     }
     else if (request.title == "get-staked-positions") {
         handleStakedPositions(request, reply)
+    }
+    else if (request.title == "get-token-info") {
+        handleGetTokenInfo(request, reply)
     }
     else if (request.title == "get-token-info") {
         handleGetTokenInfo(request, reply)

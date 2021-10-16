@@ -128,3 +128,31 @@
 .show-wallet-eq-balance span {
     margin-top: 4px;
 }
+
+.input-select-funds {
+    min-width: 144px;
+    padding-left: 12px!important;
+}
+
+.input-amount-funds {
+    padding-left: 13px!important;
+    max-width: 133px!important;
+    min-width: 133px;
+}
+
+.input-to-funds {
+    padding-left: 13px!important;
+    padding-right: 13px!important;
+    max-width: 122px!important;
+    min-width: 122px;
+}
+
+.info-send-funds-title {
+    margin-bottom: 7px!important;
+}
+
+.modal-form-container h1:first-of-type {
+    color: #003057;
+    font-size: 20px;
+    font-weight: 600;
+}
