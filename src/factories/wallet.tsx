@@ -1,6 +1,7 @@
 import { Wallet } from "../classes/wallet"
 import { KeystoreT } from '@radixdlt/crypto'
 import { SigningKeychainT } from "@radixdlt/account";
+import { AccountT } from "@radixdlt/application";
 
 export interface WalletFactoryInterface {
     newWallet(): Promise<Wallet>;
@@ -9,6 +10,7 @@ export interface WalletFactoryInterface {
     saveViewingAddress(index: number): Promise<void>;
     getViewingAddress(): Promise<number>;
     restoreViewingAddress(): Promise<void>;
+    monitorAddresses(addresses: AccountT[]): Promise<void>;
 }
 
 export default class LocalWalletFactory implements WalletFactoryInterface {
@@ -50,6 +52,23 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             })
         })
     }
+    monitorAddresses(addresses: AccountT[]): Promise<void> {
+        return new Promise((resolve, reject) => {
+            chrome.storage.local.get(["monitor"], (monitor) => {
+                const error = chrome.runtime.lastError;
+                if (error) return reject(error)
+
+                let addressesString = addresses.map(account => account.address.toString())
+                monitor["monitor"] = addressesString
+
+                chrome.storage.local.set({ "monitor": monitor["monitor"] }, () => {
+                    const error = chrome.runtime.lastError;
+                    if (error) return reject(error)
+                    resolve()
+                })
+            })
+        })
+    }
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             const json = JSON.stringify(keystore, null, '\t')
@@ -57,6 +76,7 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             chrome.storage.local.set({ "keystore": keystore }, () => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
+                resolve()
             });
         });
     }
@@ -65,6 +85,8 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             await chrome.storage.local.set({ "keystore": undefined });
             await chrome.storage.local.set({ "address": 0 });
             await chrome.storage.local.set({ "addresses": 2 });
+            await chrome.storage.local.set({ "currency": "USD" });
+            await chrome.storage.local.set({ "monitor": [] });
             resolve(new Wallet())
         });
     }
@@ -78,18 +100,20 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
                     const error = chrome.runtime.lastError;
                     if (error || typeof keystore["keystore"] === 'undefined') throw Error
 
-                    // Seed
                     chrome.storage.local.get(["address"], async (address) => {
                         chrome.storage.local.get(["addresses"], async (addresses) => {
-                            wallet = new Wallet()
-                            wallet.key = Wallet.newKey()
+                            chrome.storage.local.get(["currency"], async (currency) => {
+                                wallet = new Wallet()
+                                wallet.key = Wallet.newKey()
 
-                            wallet.key.keystore = keystore["keystore"]
-                            wallet.selectedAddress = address["address"]
-                            wallet.addresses = addresses["addresses"]
+                                wallet.key.keystore = keystore["keystore"]
+                                wallet.selectedAddress = address["address"]
+                                wallet.addresses = addresses["addresses"]
+                                wallet.currency = currency["currency"]
 
-                            console.log(wallet)
-                            resolve(wallet)
+                                console.log(wallet)
+                                resolve(wallet)
+                            })
                         })
                     })
                 }

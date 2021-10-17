@@ -2,7 +2,7 @@ import { Wallet } from "../classes/wallet";
 import LocalWalletFactory, { WalletFactoryInterface } from "../factories/wallet";
 import { KeystoreT } from '@radixdlt/crypto'
 import { resolve } from "path";
-import NetworkFactory, { NetworkFactoryInterface } from "../factories/network";
+import NetworkFactory, { NetworkFactoryInterface, NETWORKS } from "../factories/network";
 import { Network } from "../classes/network";
 import { first } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs'
@@ -22,33 +22,57 @@ export interface Provider {
     getWallet(): Promise<Wallet>;
     newWallet(): Promise<Wallet>;
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void>;
-    connectWallet(wallet: Wallet): Promise<boolean>;
-    getInstance(): RadixT;
     saveViewingAddress(index: number): Promise<void>;
     getViewingAddress(): Promise<number>;
-    restoreViewingAddress(): Promise<number>;
+    restoreViewingAddress(): Promise<void>;
+    monitorAddresses(addresses: AccountT[]): Promise<void>;
+
+    addRadixNetwork(network: Network): Promise<void>;
+    useRadixNetwork(network: Network): Promise<void>;
+    getCurrentNetwork(): Promise<Network>;
 }
 
 export class LocalProvider implements Provider {
     walletFactory: WalletFactoryInterface;
     networkFactory: NetworkFactoryInterface;
 
-    radix: RadixT;
-    network?: Network;
+    constructor(networkFactory?: NetworkFactoryInterface);
+    constructor(networkFactory?: NetworkFactoryInterface, walletFactory?: WalletFactoryInterface) {
+        this.walletFactory = walletFactory || new LocalWalletFactory()
+        this.networkFactory = networkFactory || new NetworkFactory(([NETWORKS.MAINNET]))
 
-    constructor(walletFactory?: WalletFactoryInterface) {
-        this.walletFactory = walletFactory ? walletFactory : new LocalWalletFactory()
-        this.networkFactory = new NetworkFactory()
-        this.radix = Radix.create()
-
-        this.networkFactory.newNetwork("MAINNET", "https://mainnet.radixdlt.com")
+        if(!networkFactory)
+            this.networkFactory.setSelectedNetwork(NETWORKS.MAINNET)
     }
-    restoreViewingAddress(): Promise<number> {
-        throw this.walletFactory.restoreViewingAddress()
+
+    getCurrentNetwork(): Promise<Network> {
+        return this.networkFactory.getSelectedNetwork()
+    }
+
+    addRadixNetwork(network: Network): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.networkFactory.addNetwork(network)
+            resolve()
+        })
+    }
+
+    useRadixNetwork(network: Network): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.networkFactory.setSelectedNetwork(network)
+            resolve()
+        })
+    }
+
+    monitorAddresses(addresses: AccountT[]): Promise<void> {
+        return this.walletFactory.monitorAddresses(addresses)
+    }
+
+    restoreViewingAddress(): Promise<void> {
+        return this.walletFactory.restoreViewingAddress()
     }
 
     getViewingAddress(): Promise<number> {
-        throw this.walletFactory.getViewingAddress()
+        return this.walletFactory.getViewingAddress()
     }
 
     saveViewingAddress(index: number): Promise<void> {
@@ -65,15 +89,5 @@ export class LocalProvider implements Provider {
 
     saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void> {
         return this.walletFactory.saveWallet(keystore, wallet)
-    }
-
-    connectWallet(wallet: Wallet): Promise<boolean> {
-        return new Promise(async (finish) => {
-            console.log("Connecting Wallet...")
-            finish(true)
-        });
-    }
-    getInstance(): RadixT {
-        return this.radix
     }
 }

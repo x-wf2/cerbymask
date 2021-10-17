@@ -144,6 +144,7 @@ button {
   font-size: 39px;
   position: relative;
   background-color: #f2f2fc;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
 .button-normal {
@@ -280,5 +281,5 @@ button {
 }
 
 .send-funds-top {
-  top: 144px;
+  top: 106px;
 }

@@ -13,12 +13,16 @@ import {
     unlockWallet,
     getStakedPositions,
     getTokenBalances,
+    monitorAddressesForProvider,
+    setBackgroundNetwork
 } from './utils/utils';
 
 import './css/App.css';
 import cerbie from './img/cerbie.png';
 import { AccountT, WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
+import NetworkFactory, { NETWORKS } from '../factories/network';
+import { Network } from '../classes/network';
 
 interface ICerbieProps {
 }
@@ -40,16 +44,21 @@ interface ICerbieState {
     onCreateWallet: Function;
     onCompleteWallet: Function;
     onUnlockWallet: Function;
+    onNetworkChange: Function;
 }
 
 export default class App extends Component<ICerbieProps, ICerbieState> {
 
+    networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
+
     constructor(props: any) {
         super(props)
-
+        
+        const network = this.networkFactory.selectedNetwork
+        setBackgroundNetwork(network as Network)
         this.state = {
             wallet: new Wallet(),
-            provider: new LocalProvider(),
+            provider: new LocalProvider(this.networkFactory),
             error: "",
 
             loading: true,
@@ -72,28 +81,40 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                         }
                     }))
 
-                    if (isNewHigh)
-                        this.refreshWalletAddresses()
+                    if (isNewHigh) {
+                        let addresses = this.refreshWalletAddresses()
+                        await monitorAddressesForProvider(addresses, this.state.provider)
+                    }
                     resolve(true)
                     this.refreshWalletInfo()
                 })
             },
 
-            onCreateWallet: () => { saveWalletForProvider(this.state.wallet, this.state.provider); this.state.provider.restoreViewingAddress() },
+            onCreateWallet: async () => {
+                let radixWallet = await saveWalletForProvider(this.state.wallet, this.state.provider);
+                this.setState((state) => ({wallet: {...state.wallet, radixWallet: radixWallet}}))
+                this.state.provider.restoreViewingAddress()
+                let addresses = this.refreshWalletAddresses()
+                monitorAddressesForProvider(addresses, this.state.provider)
+            },
             onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, resetting: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
             onUnlockWallet: async () => {
                 let radixWallet: RadixWalletT
                 try {
-                    radixWallet = await unlockWallet(this.state.wallet)
+                    radixWallet = await unlockWallet(this.state.wallet, this.state.provider)
                 }
                 catch (e) {
                     this.setState((state) => ({ ...state, error: "Unable to unlock wallet" }))
                     return
                 }
-                // Unlock
                 this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixWallet: radixWallet, unlocked: true } }))
                 this.refreshWalletAddresses()
                 await this.refreshWalletInfo()
+            },
+            onNetworkChange: async (e: any) => {
+                const name = e.target.value
+                const network = (await this.networkFactory.getNetwork(name))[0]
+                this.networkFactory.setSelectedNetwork(network)
             }
         }
     }
@@ -144,6 +165,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async showModal(type: number) {
         this.setState((state) => ({ ...state, showingModal: true, showingForm: type }))
     }
+
     async closeModal() {
         this.setState((state) => ({ ...state, showingModal: false }))
     }
@@ -153,6 +175,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         let restored = this.state.wallet.radixWallet?.restoreLocalHDAccountsToIndex(this.state.wallet.addresses)
         restored?.forEach((item) => item.all.forEach((address) => radixPublicAddresses.push(address)))
         this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixPublicAddresses: radixPublicAddresses } }))
+        return radixPublicAddresses
     }
 
     render(): ReactNode {
@@ -182,10 +205,12 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     {this.state.wallet.key !== undefined && !this.state.generating && !this.state.resetting && !this.state.wallet.unlocked &&
                         <UnlockWallet
                             wallet={this.state.wallet}
+                            networks={this.networkFactory.networks}
                             error={this.state.error}
                             forgotPassword={() => this.showForgotPassword()}
                             onPasswordChange={this.state.onPasswordChange}
-                            onUnlockWallet={this.state.onUnlockWallet}>
+                            onUnlockWallet={this.state.onUnlockWallet}
+                            onNetworkChange={this.state.onNetworkChange}>
                         </UnlockWallet>
                     }
                     {this.state.generating &&

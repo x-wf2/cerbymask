@@ -87,7 +87,7 @@ export default function ShowWallet(props: any) {
         <div className="full-height-container" style={{ width: "100%", overflowX: "auto", wordBreak: "break-all" }}>
             <div className="show-wallet-header">
                 <div className="show-wallet-choose-address-container">
-                    <select onChange={onAddressChange} className="show-wallet-choose-address">
+                    <select onChange={onAddressChange} className="show-wallet-choose-address green-text">
                         {props.wallet.radixPublicAddresses?.map((address: any, index: any) => {
                             return (<option value={index} selected={index == selected}>{index + 1}. {formatAddress(address.address.toString())}</option>)
                         })}

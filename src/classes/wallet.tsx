@@ -27,6 +27,7 @@ export class Wallet {
     unlocked: Boolean;
     password?: string;
 
+    currency: string;
     addresses: number;
     selectedAddress: number;
 
@@ -45,6 +46,7 @@ export class Wallet {
         this.radixBalances = []
         this.radixStakes = []
         this.radixTokens = []
+        this.currency = "USD"
     }
 
     static newKey() {
