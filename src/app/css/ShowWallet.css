@@ -66,7 +66,7 @@
     color: rgb(0, 48, 87, 1);
 }
 .show-wallet-main-action-button:hover .show-wallet-main-action-circle {
-    background-color: #00c389;
+    background-color: #00c389!important;
 }
 
 .show-wallet-charts {
@@ -161,6 +161,6 @@
 
 .show-network-choose-address-container {
     position: absolute;
-    left: 38%;
+    left: 36.8%;
     top: 135px;
 }

@@ -7,6 +7,10 @@ BigNumber.set({
     EXPONENTIAL_AT: [-30, 30]
 })
 
+export function validateAddress(address: string, ) {
+
+}
+
 export function formatAddress(address: string) {
     return `${address.substring(0, 3)}..${address.substring(address.length - 20)}`
 }

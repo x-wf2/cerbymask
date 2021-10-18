@@ -24,7 +24,7 @@ export default function UnlockWallet(props: any) {
                     <input className="input-password" type="password" onChange={(e) => props.onPasswordChange(e)}></input>
                 </div>
                 <div className="info-content-actions">
-                    <button className="button-normal" onClick={() => props.onUnlockWallet()}>
+                    <button className="button-normal darker-background" onClick={() => props.onUnlockWallet()}>
                         Continue
                     </button>
                 </div>

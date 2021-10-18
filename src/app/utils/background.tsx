@@ -26,7 +26,7 @@ export function getWalletBalance(address: string): Promise<any> {
     return new Promise(async (resolve) => {
         let response = await generateBackgroundRequest("get-wallet-funds", { address: address })
         let xrdBalances = response.filter((item: any) => { return item.rri == "xrd_rr1qy5wfsfh" })
-        let filtered = xrdBalances.map((item: any) => { return { ...item, amount: Amount.fromUnsafe(item.amount) } })
+        let filtered = xrdBalances.map((item: any) => { return { ...item, amount: item.amount } })
         resolve(filtered)
     })
 }

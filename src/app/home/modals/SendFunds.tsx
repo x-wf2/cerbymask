@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { BigNumber } from "bignumber.js"
+import BigNumber from "bignumber.js"
 import { formatBigNumber } from "../../utils/formatters"
 
 export type FieldErrorsT = Readonly<{
@@ -22,19 +22,62 @@ export default function SendFunds(props: any) {
         setToken(index)
         // setErrors({...errors, message: "Invalid Message 2"})
     }
-
+    
     function handleInputChange(e: any) {
         const field = e.target.name;
         const value = e.target.value;
-
-        if(field === "amount")
-            if(value)
+        
         setFields({ ...fields, [field]: value })
+        setErrors({ ...errors, [field]: "" })
+    }
+
+    function handleKeyDown(e: any) {
+        const field = e.target.name;
+        const futureAmount = `${fields.amount}${e.key}`
+
+        if(field === "amount") {
+            const currBalance =  new BigNumber((token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && props.wallet.radixBalances[props.wallet.selectedAddress].xrd) : 
+            (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount)))
+
+            try {
+                const parsedValue = parseFloat(futureAmount)
+                if(currBalance.shiftedBy(-18).isLessThan(parsedValue) || parsedValue < 0 || futureAmount.indexOf("-") > -1) {
+                    e.preventDefault()
+                    return;
+                }
+            }
+            catch(error) {
+                e.preventDefault()
+                return;
+            }
+        }
     }
 
     function onStartNewTransaction() {
-        console.log(fields)
+        const validAmount = validateAmount(fields.amount)
+        console.log(`Amount is valid? ${validAmount}`)
+        // const validTo = validateAddress(fields.to)
     }
+
+    function validateAmount(amount: string) {
+        const currBalance =  new BigNumber((token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && props.wallet.radixBalances[props.wallet.selectedAddress].xrd) : 
+            (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount)))
+
+        let parsedAmount = -1
+        try {
+            parsedAmount = parseFloat(amount)
+        }
+        catch(e) { return false }
+        if(currBalance.shiftedBy(-18).isLessThan(parsedAmount)) {
+            setErrors({ ...errors, amount: "Amount is higher than balance." })
+            return false
+        }
+        else if(parsedAmount <= 0) {
+            setErrors({ ...errors, amount: "Amount is invalid." })
+            return false
+        }
+        return true
+    } 
 
     return (
         <div className="modal-form-container">
@@ -73,10 +116,11 @@ export default function SendFunds(props: any) {
                                 min="0"
                                 step="1"
                                 onChange={handleInputChange}
+                                onKeyPress={handleKeyDown} 
                                 name="amount"
-                                max={token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd?.value.toString()).shiftedBy(-18).toNumber() || 0) :
+                                max={token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()).shiftedBy(-18).toNumber() || 0) :
                                     (props.wallet.selectedAddress < props.wallet.radixTokens.length && new BigNumber(props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount).shiftedBy(-18).toNumber() || 0)}
-                                placeholder={`Max: ${token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && formatBigNumber(new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd?.value.toString()).shiftedBy(-18)) || 0) :
+                                placeholder={`Max: ${token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && formatBigNumber(new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()).shiftedBy(-18)) || 0) :
                                     (props.wallet.selectedAddress < props.wallet.radixTokens.length && formatBigNumber(new BigNumber(props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount).shiftedBy(-18)))}`}></input>
                         </div>
                     </div>
@@ -106,7 +150,7 @@ export default function SendFunds(props: any) {
                         </div>
                     </div>
                     <div className="info-content-actions">
-                        <button className="button-normal" onClick={onStartNewTransaction}>
+                        <button className="button-normal darker-background" onClick={onStartNewTransaction}>
                             Next
                         </button>
                     </div>

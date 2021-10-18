@@ -97,7 +97,7 @@ export default function ShowWallet(props: any) {
                 </div>
                 <p className="show-wallet-balance">
                     {(props.wallet.radixBalances.length == 0 || selected > (props.wallet.radixBalances.length - 1)) && `0`}
-                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length - 1) && props.wallet.radixBalances[selected].xrd != undefined && formatBalance(props.wallet.radixBalances[selected].xrd?.value)}
+                    {props.wallet.radixBalances.length > 0 && selected <= (props.wallet.radixBalances.length - 1) && props.wallet.radixBalances[selected].xrd != undefined && formatBalance(props.wallet.radixBalances[selected].xrd)}
                     &nbsp;XRD
                 </p>
                 <p className="show-wallet-eq-balance">
@@ -109,19 +109,19 @@ export default function ShowWallet(props: any) {
             <div className="show-wallet-main-actions">
                 <div className="show-wallet-main-actions-buttons">
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_RECEIVE_FUNDS)}>
-                        <div className="show-wallet-main-action-circle">
+                        <div className="show-wallet-main-action-circle dark-background">
                             <Download width="16px" />
                         </div>
                         Receive
                     </button>
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
-                        <div className="show-wallet-main-action-circle">
+                        <div className="show-wallet-main-action-circle dark-background">
                             <PaperPlane width="16px" />
                         </div>
                         Send
                     </button>
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_STAKE_FUNDS)}>
-                        <div className="show-wallet-main-action-circle">
+                        <div className="show-wallet-main-action-circle dark-background">
                             <LockAlt width="16px" />
                         </div>
                         Stake
@@ -143,6 +143,12 @@ export default function ShowWallet(props: any) {
 
                 {/* Tokens */}
                 <TokensSection wallet={props.wallet} />
+            </div>
+            <div className="footer">
+                <div className="centered-flex">
+                    <p className="small no-margin gray-text-3">CerbyMask v1.1</p>
+                    <p className="small no-margin gray-text-3">Get Support</p>
+                </div>
             </div>
         </div>
     )

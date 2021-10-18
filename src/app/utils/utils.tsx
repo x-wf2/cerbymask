@@ -83,12 +83,12 @@ export async function getXRDUSDBalances(radixPublicAddresses: AccountT[]) {
 
     return Promise.all(radixPublicAddresses.map(async (address) => {
         let balance = (await getWalletBalance(address?.address.toString()))[0]
-        let usdBalance = new BigNumber(balance?.amount.value.toString())
+        let usdBalance = new BigNumber(balance?.amount.toString())
             .multipliedBy(parseFloat(xrdValue.bid))
             .shiftedBy(-18).toFixed(4)
         return {
             address: address.address.toString(),
-            xrd: !balance ? { value: new BigNumber(0) } : balance?.amount,
+            xrd: !balance ? new BigNumber(0) : balance?.amount,
             balance: !balance ? 0 : usdBalance
         } as WalletBalanceT
     }))
