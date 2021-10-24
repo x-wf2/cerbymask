@@ -1,7 +1,7 @@
 <p align="center">
     <img src="public/android-chrome-512x512.png" style="width:200px;">
     <h1 style="margin-top: -20px;text-align: center;border-bottom: none;">CerbyMask</h1>
-    <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Wallet</p>
+    <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Lightweight Wallet</p>
 </p>
 
 # 🚀 Features
@@ -54,5 +54,4 @@ $ npm run test
 
 Navigate to `chrome://extensions`
 
-Locate `Load unpacked` and point to the `build` folder
-You can build
+Locate `Load unpacked` and point to the `build` folder you either built or downloaded.

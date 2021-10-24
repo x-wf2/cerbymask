@@ -1,20 +1,20 @@
-chrome.windows.onCreated.addListener(function() {
+chrome.windows.onCreated.addListener(function () {
     console.log("CerbyMask detected a new browser opening")
     startMonitoring()
     chrome.alarms.create('monitor', { periodInMinutes: 1 });
 })
 
-chrome.runtime.onInstalled.addListener(function() {
+chrome.runtime.onInstalled.addListener(function () {
     console.log("CerbyMask detected a new installation")
     startMonitoring()
     chrome.alarms.create('monitor', { periodInMinutes: 1 });
 })
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
     if (alarm.name == 'monitor') {
         startMonitoring()
-        for(let i = 1; i <= 5; i++) // 1 min
-            setTimeout(() => {startMonitoring()}, i*10000)
+        for (let i = 1; i <= 5; i++) // 1 min
+            setTimeout(() => { startMonitoring() }, i * 10000)
     }
 })
 
@@ -43,6 +43,12 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     else if (request.title == "finalize-transaction") {
         handleFinalizeTransaction(request, reply)
     }
+    else if (request.title == "get-validators") {
+        handleGetValidators(request, reply)
+    }
+    else if (request.title == "get-promoted-validators") {
+        handleGetPromotedValidators(request, reply)
+    }
     return true;
 });
 
@@ -53,16 +59,17 @@ let WalletFundsValueCache = {};
 let XRDValueCache = {};
 
 function startMonitoring() {
+
     chrome.storage.local.get(["monitor"], async (monitor) => {
         let addresses = monitor["monitor"]
-        if(addresses) {
-            await handleGetXRDUSDValue({data: {canUpdate: true}}, () => {})
+        if (addresses) {
+            await handleGetXRDUSDValue({ data: { canUpdate: true } }, () => { })
             addresses.map(async (address) => {
-                await handleStakedPositions({data: {address: address, canUpdate: true}}, () => {})
-                await handleGetWalletFunds({data: {address: address, canUpdate: true}}, (balances) => {
-                    balances.map(async (item) => await handleGetTokenInfo({data: {rri: item.rri, canUpdate: true}}, () => {}))
+                await handleStakedPositions({ data: { address: address, canUpdate: true } }, () => { })
+                await handleGetWalletFunds({ data: { address: address, canUpdate: true } }, (balances) => {
+                    balances.map(async (item) => await handleGetTokenInfo({ data: { rri: item.rri, canUpdate: true } }, () => { }))
                 })
-            }, () => {})
+            }, () => { })
         }
     })
 }
@@ -76,7 +83,7 @@ async function handleSetNetwork(request, reply) {
 async function handleGetTokenInfo(request, reply) {
     const rri = request.data.rri
     const canUpdate = request.data.canUpdate || false
-    if(!TokensInfoValueCache[rri] || canUpdate && (Number(new Date()) - Number(TokensInfoValueCache[rri].lastUpdate)) > 600000) {
+    if (!TokensInfoValueCache[rri] || canUpdate && (Number(new Date()) - Number(TokensInfoValueCache[rri].lastUpdate)) > 600000) {
         const rawResponse = await getData("tokens.get_info", { "rri": rri })
         const content = await rawResponse.json();
         TokensInfoValueCache[rri] = {
@@ -90,7 +97,7 @@ async function handleGetTokenInfo(request, reply) {
 async function handleStakedPositions(request, reply) {
     const address = request.data.address
     const canUpdate = request.data.canUpdate || false
-    if(!WalletStakeValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletStakeValueCache[address].lastUpdate)) > 20000)) {
+    if (!WalletStakeValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletStakeValueCache[address].lastUpdate)) > 20000)) {
         const rawResponse = await getData("account.get_stake_positions", { "address": address })
         const content = await rawResponse.json();
         WalletStakeValueCache[address] = {
@@ -104,12 +111,12 @@ async function handleStakedPositions(request, reply) {
 async function handleGetXRDUSDValue(request, reply) {
     const canUpdate = request.data.canUpdate || false
     const emptyBid = { bid: 0 }
-    if(currentNetwork.name !== "MAINNET") {
+    if (currentNetwork.name !== "MAINNET") {
         XRDValueCache = {
             response: emptyBid
         }
     }
-    else if(!('lastUpdate' in XRDValueCache) || canUpdate && (Number(new Date()) - Number(XRDValueCache.lastUpdate)) > 5000) {
+    else if (!('lastUpdate' in XRDValueCache) || canUpdate && (Number(new Date()) - Number(XRDValueCache.lastUpdate)) > 5000) {
         let content
         const rawResponse = await fetch('https://api.bitfinex.com/v1/pubticker/xrdusd', {})
         content = await rawResponse.json();
@@ -125,7 +132,7 @@ async function handleGetXRDUSDValue(request, reply) {
 async function handleGetWalletFunds(request, reply) {
     const address = request.data.address
     const canUpdate = request.data.canUpdate || false
-    if(!WalletFundsValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletFundsValueCache[address].lastUpdate)) > 5000)) {
+    if (!WalletFundsValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletFundsValueCache[address].lastUpdate)) > 5000)) {
         const rawResponse = await getData("account.get_balances", { "address": address })
         const json = await rawResponse.json()
         WalletFundsValueCache[address] = {
@@ -140,8 +147,8 @@ async function handleBuildTransaction(request, reply) {
     let transaction = request.data.transaction
     transaction.type = "TokenTransfer"
 
-    const transactionPayload = {  "actions": [transaction], "feePayer": transaction.from }
-    const rawResponse = await getData("construction.build_transaction", transactionPayload,"construction")
+    const transactionPayload = { "actions": [transaction], "feePayer": transaction.from }
+    const rawResponse = await getData("construction.build_transaction", transactionPayload, "construction")
 
     const json = await rawResponse.json()
     reply(json.result)
@@ -151,23 +158,43 @@ async function handleFinalizeTransaction(request, reply) {
     let transaction = request.data.transaction
     transaction.immediateSubmit = true
 
-    const rawResponse = await getData("construction.finalize_transaction", transaction, "construction")
+    try {
+        const rawResponse = await getData("construction.finalize_transaction", transaction, "construction")
+        const json = await rawResponse.json()
+        reply(json.result)
+    }
+    catch(e) {
+        reply({})
+    }
+}
 
+async function handleGetValidators(request, reply) {
+    let size = request.data.size || 25
+    let params = { "size": size }
+    const rawResponse = await getData("validators.get_next_epoch_set", params)
     const json = await rawResponse.json()
     reply(json.result)
 }
 
-async function getData(method, params, endpoint="archive") {
-    const payload = { "jsonrpc": "2.0", "id": "0", "method": method, "params":  params}
-    let url = currentNetwork.url || "https://mainnet.radixdlt.com/"
+async function handleGetPromotedValidators(request, reply) {
+    const rawResponse = await fetch('https://api.npoint.io/e362e89867d427eba6cf', {})
+    const content = await rawResponse.json();
+    reply(content)
+}
+
+async function getData(method, params, endpoint = "archive") {
+    const payload = { "jsonrpc": "2.0", "id": "0", "method": method, "params": params }
+    
+    if (!currentNetwork || Object.keys(currentNetwork).length == 0)
+        currentNetwork = await refreshNetwork()
+
+    let url = currentNetwork.url
 
     // URL Discovery
-    if('address' in params) {
-        if(params.address.startsWith("rdx"))
-            url = "https://mainnet.radixdlt.com/"
-        else if(params.address.startsWith("tdx"))
-            url = "https://stokenet.radixdlt.com/"
-    }
+    if ('address' in params)
+        url = getNetworkFromAddress(params.address)
+    else if ('feePayer' in params)
+        url = getNetworkFromAddress(params.feePayer)
 
     try {
         const rawResponse = await fetch(`${url}${endpoint}`, {
@@ -180,8 +207,25 @@ async function getData(method, params, endpoint="archive") {
         });
         return rawResponse
     }
-    catch(e) {
+    catch (e) {
         console.log(e)
         return {}
     }
+}
+
+function getNetworkFromAddress(address) {
+    let url
+    if (address.startsWith("rdx"))
+        url = "https://mainnet.radixdlt.com/"
+    else if (address.startsWith("tdx"))
+        url = "https://stokenet.radixdlt.com/"
+    return url
+}
+
+function refreshNetwork() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(["network"], async (network) => {
+            resolve(JSON.parse(network["network"]))
+        })  
+    })
 }
