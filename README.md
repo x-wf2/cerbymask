@@ -12,6 +12,16 @@
 - Multiple Public Addresses management
 - Realtime USD for balance and stake
 
+# Install
+
+- Download directly from Chrome Web Store
+- Build the extension by following the previous steps
+- Or download directly a build from [Github](https://github.com/x-wf2/cerbymask/releases)
+
+Navigate to `chrome://extensions`
+
+Locate `Load unpacked` and point to the `build` folder you either built or downloaded.
+
 # Getting Started 
 
 The plugin is in very early stages of development and it is community driven.
@@ -45,13 +55,3 @@ In order to run tests, execute:
 ```bash
 $ npm run test
 ```
-
-## Install
-
-- Download directly from Chrome Web Store
-- Build the extension by following the previous steps
-- Or download directly a build from Github
-
-Navigate to `chrome://extensions`
-
-Locate `Load unpacked` and point to the `build` folder you either built or downloaded.
