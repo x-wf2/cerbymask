@@ -29,13 +29,13 @@ button {
 }
 
 .App-header {
-  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   align-content: center;
-  justify-content: center;
+  padding-left: 16px;
+  padding-right: 16px;
   font-size: calc(20px + 2vmin);
   color: #282c34;
   box-shadow: 0px 0px 6px #282c34;
@@ -43,6 +43,7 @@ button {
 
 .App-title {
   font-size: 20px;
+  font-weight: bold;
 }
 
 .App-cerbie-logo {
@@ -50,9 +51,10 @@ button {
 }
 
 .logo-svg {
+  margin-top:10px;
+  margin-bottom:10px;
   width: 43px;
-  height: 54px;
-  fill: red;
+  height: 40px;
 }
 
 .App-cerbie-logo-container {
@@ -199,11 +201,11 @@ button {
 }
 
 .dark-background {
-  background-color: #003057 !important;
+  background-color: rgb(50, 54, 77)!important;
 }
 
 .darker-background {
-  background-color: #00192e !important;
+  background-color: rgb(50, 54, 77)!important;
 }
 
 .strong-1 {
@@ -311,7 +313,23 @@ button {
 }
 
 .send-funds-top {
-  top: 106px;
+  top: 136px;
+}
+
+.send-funds-confirm-top {
+  top: 89px;
+}
+
+.gap-m-1 {
+  column-gap: 7px;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
 }
 
 .footer {

@@ -50,7 +50,7 @@
     height: 36px!important;
     border: 0;
     border-radius: 50%;
-    background-color: rgb(0, 48, 87, 0.5);
+    background-color: rgba(50, 54, 77, 0.8)!important;
     color: #f2f2fc;
     font-size: 11px;
     display: flex;

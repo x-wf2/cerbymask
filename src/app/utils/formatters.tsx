@@ -1,14 +1,19 @@
 import { AmountT } from '@radixdlt/application'
 import BigNumber from 'bignumber.js'
-
+import { Network } from '../../classes/network'
 
 BigNumber.set({
     ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
     EXPONENTIAL_AT: [-30, 30]
 })
 
-export function validateAddress(address: string, ) {
-
+export function validateAddress(address: string, network: Network) {
+    if(network.name === "MAINNET" && address.startsWith("rdx"))
+        return true
+    else if(network.name === "STOKENET" && address.startsWith("tdx"))
+        return true
+    else
+        return false
 }
 
 export function formatAddress(address: string) {

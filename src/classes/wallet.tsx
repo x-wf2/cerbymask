@@ -1,6 +1,7 @@
 import { AccountAddressT } from "@radixdlt/account";
 import { WalletT as RadixWalletT, Wallet as RadixWallet, AccountT } from "@radixdlt/application";
 import Key from "./key";
+import { Network } from "./network";
 
 export type WalletBalanceT = Readonly<{
     address: string,
@@ -36,6 +37,8 @@ export class Wallet {
     radixBalances: WalletBalanceT[];
     radixStakes: WalletStakeT[];
     radixTokens: WalletTokensT[];
+
+    network?: Network;
 
     constructor() { 
         this.unlocked = false;

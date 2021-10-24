@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react"
+import React, { ReactNode, useEffect, useState } from "react"
 import "../css/ShowWallet.css"
 import { formatAddress, formatBalance, formatBigNumber } from "../utils/formatters"
 import { Copy } from "@styled-icons/fa-regular"
@@ -6,6 +6,7 @@ import { PaperPlane, LockAlt, DollarCircle } from "@styled-icons/boxicons-regula
 import { Download } from "@styled-icons/boxicons-solid"
 import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS, TYPE_STAKE_FUNDS } from "./ShowModal"
 import BigNumber from "bignumber.js"
+import { clearInterval } from "timers"
 
 export function TokensSection(props: any) {
     return (
@@ -109,19 +110,19 @@ export default function ShowWallet(props: any) {
             <div className="show-wallet-main-actions">
                 <div className="show-wallet-main-actions-buttons">
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_RECEIVE_FUNDS)}>
-                        <div className="show-wallet-main-action-circle dark-background">
+                        <div className="show-wallet-main-action-circle">
                             <Download width="16px" />
                         </div>
                         Receive
                     </button>
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_SEND_FUNDS)}>
-                        <div className="show-wallet-main-action-circle dark-background">
+                        <div className="show-wallet-main-action-circle">
                             <PaperPlane width="16px" />
                         </div>
                         Send
                     </button>
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_STAKE_FUNDS)}>
-                        <div className="show-wallet-main-action-circle dark-background">
+                        <div className="show-wallet-main-action-circle">
                             <LockAlt width="16px" />
                         </div>
                         Stake

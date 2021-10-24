@@ -48,6 +48,11 @@ $ npm run test
 
 ## Install
 
+- Download directly from Chrome Web Store
+- Build the extension by following the previous steps
+- Or download directly a build from Github
+
 Navigate to `chrome://extensions`
 
 Locate `Load unpacked` and point to the `build` folder
+You can build

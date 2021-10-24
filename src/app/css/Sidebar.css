@@ -1,0 +1,22 @@
+.sidebar-container {
+    position: absolute;
+    height: 189.9vh;
+    width: 299px;
+    background-color: rgba(58, 59, 66, 0.89)!important;
+    right: -299px;
+    z-index: 2;
+    transition: transform .5s;
+}
+
+.opened {
+    transform: translateX(-299px)
+}
+
+.sidebar-close {
+    position: relative;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.6);
+    width: 22px;
+    left: 13px;
+    top: -1px;
+}

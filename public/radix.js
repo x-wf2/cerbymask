@@ -1,11 +1,21 @@
 chrome.windows.onCreated.addListener(function() {
     console.log("CerbyMask detected a new browser opening")
-    setInterval(() => {startMonitoring()}, 2000)
+    startMonitoring()
+    chrome.alarms.create('monitor', { periodInMinutes: 1 });
 })
 
 chrome.runtime.onInstalled.addListener(function() {
     console.log("CerbyMask detected a new installation")
-    setInterval(() => {startMonitoring()}, 2000)
+    startMonitoring()
+    chrome.alarms.create('monitor', { periodInMinutes: 1 });
+})
+
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    if (alarm.name == 'monitor') {
+        startMonitoring()
+        for(let i = 1; i <= 5; i++) // 1 min
+            setTimeout(() => {startMonitoring()}, i*10000)
+    }
 })
 
 chrome.runtime.onMessage.addListener((request, sender, reply) => {
@@ -26,6 +36,12 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     }
     else if (request.title == "set-network") {
         handleSetNetwork(request, reply)
+    }
+    else if (request.title == "build-transaction") {
+        handleBuildTransaction(request, reply)
+    }
+    else if (request.title == "finalize-transaction") {
+        handleFinalizeTransaction(request, reply)
     }
     return true;
 });
@@ -87,9 +103,17 @@ async function handleStakedPositions(request, reply) {
 
 async function handleGetXRDUSDValue(request, reply) {
     const canUpdate = request.data.canUpdate || false
-    if(!('lastUpdate' in XRDValueCache) || canUpdate && (Number(new Date()) - Number(XRDValueCache.lastUpdate)) > 5000) {
+    const emptyBid = { bid: 0 }
+    if(currentNetwork.name !== "MAINNET") {
+        XRDValueCache = {
+            response: emptyBid
+        }
+    }
+    else if(!('lastUpdate' in XRDValueCache) || canUpdate && (Number(new Date()) - Number(XRDValueCache.lastUpdate)) > 5000) {
+        let content
         const rawResponse = await fetch('https://api.bitfinex.com/v1/pubticker/xrdusd', {})
-        const content = await rawResponse.json();
+        content = await rawResponse.json();
+
         XRDValueCache = {
             response: content,
             lastUpdate: new Date()
@@ -101,7 +125,7 @@ async function handleGetXRDUSDValue(request, reply) {
 async function handleGetWalletFunds(request, reply) {
     const address = request.data.address
     const canUpdate = request.data.canUpdate || false
-    if(!WalletFundsValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletFundsValueCache[address].lastUpdate)) > 20000)) {
+    if(!WalletFundsValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletFundsValueCache[address].lastUpdate)) > 5000)) {
         const rawResponse = await getData("account.get_balances", { "address": address })
         const json = await rawResponse.json()
         WalletFundsValueCache[address] = {
@@ -112,24 +136,52 @@ async function handleGetWalletFunds(request, reply) {
     reply(WalletFundsValueCache[address].response)
 }
 
+async function handleBuildTransaction(request, reply) {
+    let transaction = request.data.transaction
+    transaction.type = "TokenTransfer"
+
+    const transactionPayload = {  "actions": [transaction], "feePayer": transaction.from }
+    const rawResponse = await getData("construction.build_transaction", transactionPayload,"construction")
+
+    const json = await rawResponse.json()
+    reply(json.result)
+}
+
+async function handleFinalizeTransaction(request, reply) {
+    let transaction = request.data.transaction
+    transaction.immediateSubmit = true
+
+    const rawResponse = await getData("construction.finalize_transaction", transaction, "construction")
+
+    const json = await rawResponse.json()
+    reply(json.result)
+}
+
 async function getData(method, params, endpoint="archive") {
-    const payload = { "jsonrpc": "1.0", "id": "curltest", "method": method, "params":  params}
+    const payload = { "jsonrpc": "2.0", "id": "0", "method": method, "params":  params}
+    let url = currentNetwork.url || "https://mainnet.radixdlt.com/"
 
     // URL Discovery
     if('address' in params) {
         if(params.address.startsWith("rdx"))
-            currentNetwork.url = "https://mainnet.radixdlt.com/"
+            url = "https://mainnet.radixdlt.com/"
         else if(params.address.startsWith("tdx"))
-            currentNetwork.url = "https://stokenet.radixdlt.com/"
+            url = "https://stokenet.radixdlt.com/"
     }
-    
-    const rawResponse = await fetch(`${currentNetwork.url}${endpoint}`, {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'text/plain'
-        },
-        body: JSON.stringify(payload)
-    });
-    return rawResponse
+
+    try {
+        const rawResponse = await fetch(`${url}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify(payload)
+        });
+        return rawResponse
+    }
+    catch(e) {
+        console.log(e)
+        return {}
+    }
 }

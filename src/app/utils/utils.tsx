@@ -7,6 +7,8 @@ import BigNumber from "bignumber.js"
 import { formatBigNumber, numberFormatUSA } from "./formatters";
 import { Network } from "../../classes/network";
 
+export const XRD_RRI = ["xrd_rr1qy5wfsfh", "xrd_tr1qyf0x76s"]
+
 export async function generateWalletWithKeyAndMnemonic() {
     let wallet = new Wallet();
     wallet.key = Wallet.newKey()
@@ -88,6 +90,7 @@ export async function getXRDUSDBalances(radixPublicAddresses: AccountT[]) {
             .shiftedBy(-18).toFixed(4)
         return {
             address: address.address.toString(),
+            rri: !balance ? "" : balance?.rri,
             xrd: !balance ? new BigNumber(0) : balance?.amount,
             balance: !balance ? 0 : usdBalance
         } as WalletBalanceT

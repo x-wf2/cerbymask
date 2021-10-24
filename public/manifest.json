@@ -14,10 +14,12 @@
     "default_title": "CerbyMask - A Radix Protocol Lightweight Wallet"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "https://mainnet.radixdlt.com/*",
+    "https://stokenet.radixdlt.com/*",
     "https://api.bitfinex.com/*"
   ],
   "background": {
