@@ -5,11 +5,12 @@
     background-color: rgba(58, 59, 66, 0.89)!important;
     right: -299px;
     z-index: 2;
-    transition: transform .5s;
+    transition: all .5s;
 }
 
 .opened {
-    transform: translateX(-299px)
+    transform: translateX(-299px);
+    box-shadow: -3px 4px 6px rgb(0 0 0 / 20%);
 }
 
 .sidebar-close {

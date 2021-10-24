@@ -7,6 +7,7 @@ import { Download } from "@styled-icons/boxicons-solid"
 import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS, TYPE_STAKE_FUNDS } from "./ShowModal"
 import BigNumber from "bignumber.js"
 import { clearInterval } from "timers"
+import Footer from "./components/Footer"
 
 export function TokensSection(props: any) {
     return (
@@ -145,12 +146,7 @@ export default function ShowWallet(props: any) {
                 {/* Tokens */}
                 <TokensSection wallet={props.wallet} />
             </div>
-            <div className="footer">
-                <div className="centered-flex">
-                    <p className="small no-margin gray-text-3">CerbyMask v1.1</p>
-                    <p className="small no-margin gray-text-3">Get Support</p>
-                </div>
-            </div>
+            <Footer/>
         </div>
     )
 }

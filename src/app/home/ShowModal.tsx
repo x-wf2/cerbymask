@@ -8,6 +8,7 @@ import ReactDOM from "react-dom";
 import QRCode from "react-qr-code";
 import SendFunds from "./modals/SendFunds"
 import ConfirmSendFunds from "./modals/ConfirmSendFunds"
+import { ChooseValidator } from "./modals/ChooseValidator"
 
 export const TYPE_RECEIVE_FUNDS = 1
 export const TYPE_SEND_FUNDS = 2
@@ -78,13 +79,9 @@ export default function ShowModal(props: any) {
             }
 
             {props.showingForm == TYPE_STAKE_FUNDS &&
-                <div className="modal-form-container">
-                    <h1 className="normal-1">Stake Funds</h1>
-                    {props.wallet && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
-                        <div className="modal-form-column-centered">
-                        </div>
-                    }
-                </div>
+                <ChooseValidator
+                    promotedValidators={props.promotedValidators}
+                    wallet={props.wallet}/>
             }
         </div>
     )

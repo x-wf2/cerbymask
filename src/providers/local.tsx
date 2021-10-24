@@ -36,7 +36,6 @@ export class LocalProvider implements Provider {
     walletFactory: WalletFactoryInterface;
     networkFactory: NetworkFactoryInterface;
 
-    constructor(networkFactory?: NetworkFactoryInterface);
     constructor(networkFactory?: NetworkFactoryInterface, walletFactory?: WalletFactoryInterface) {
         this.walletFactory = walletFactory || new LocalWalletFactory()
         this.networkFactory = networkFactory || new NetworkFactory(([NETWORKS.MAINNET]))

@@ -22,7 +22,9 @@ import { AccountT, WalletT as RadixWalletT } from '@radixdlt/application';
 import ForgotPassword from './home/ForgotPassword';
 import NetworkFactory, { NETWORKS } from '../factories/network';
 import { Network } from '../classes/network';
-import Navbar from './home/Navbar';
+import Navbar from './home/components/Navbar';
+import { PromotedValidatorT, ValidatorT } from './types';
+import { getPromotedValidators, getValidators } from './utils/background';
 
 interface ICerbieProps {
 }
@@ -38,6 +40,7 @@ interface ICerbieState {
     showingSidebar: boolean;
     showingModal: boolean;
     showingForm: number;
+    promotedValidators: PromotedValidatorT[];
 
     onPasswordChange: Function;
     onMnemonicChange: Function;
@@ -69,6 +72,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             showingModal: false,
             showingSidebar: false,
             showingForm: 0,
+            promotedValidators: [],
 
             onPasswordChange: (event: any) => { this.setState((state) => ({ ...state, wallet: { ...state.wallet, password: event.target.value } })) },
             onMnemonicChange: (mnemonic: string) => { let key = Wallet.newKeyWithMnemonic(mnemonic); this.setState((state) => ({ ...state, wallet: { ...state.wallet, key: ('phrase' in key.mnemonic ? key : undefined) } })); return ('phrase' in key.mnemonic) },
@@ -129,6 +133,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async componentDidMount() {
         const network = (await this.networkFactory.getNetwork("MAINNET"))[0]
         await setBackgroundNetwork(network)
+        this.refreshValidators()
         this.refreshWallet()
     }
 
@@ -160,6 +165,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         this.state.wallet.radixTokens = tokens
         this.state.wallet.network = this.networkFactory.selectedNetwork
 
+        console.log(this.state.wallet)
         this.setState((state) => ({
             ...state,
             wallet: {
@@ -187,20 +193,42 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         return radixPublicAddresses
     }
 
+    async refreshValidators() {
+        let radixValidators = (await getValidators(200)).validators as ValidatorT[]
+        let cerbyPromotedValidators = (await getPromotedValidators()) as PromotedValidatorT[]
+        let promotedValidators = radixValidators.filter((validator) => {
+            const results = cerbyPromotedValidators.filter((promotedAddress) => {
+                return validator.address.indexOf(promotedAddress.address) != -1
+            })
+            return results.length > 0
+        })
+        this.setState((state) => ({ ...state, promotedValidators: promotedValidators }))
+        console.log(promotedValidators)
+    }
+
+    onAppBodyClick() {
+        if(this.state.showingSidebar)
+            this.setState(state => ({...state, showingSidebar: false}))
+    }
+
     render(): ReactNode {
         return (
             <div className="App">
                 <Navbar
+                    wallet={this.state.wallet}
+                    sidebarOpened={this.state.showingSidebar}
                     onSidebarOpen={(opened: any) => this.state.onSidebarOpen(opened)}/>
                 <ShowModal
                     wallet={this.state.wallet}
                     showingModal={this.state.showingModal}
                     showingForm={this.state.showingForm}
+                    promotedValidators={this.state.promotedValidators}
                     closeModal={() => this.closeModal()}
                     showModal={(type: number) => this.showModal(type)}
                     refreshWalletInfo={() => this.refreshWalletInfo()}/>
-
-                <div className={`App-body ${(this.state.showingModal || this.state.showingSidebar) ? 'blur' : ''}`}>
+                <div
+                    onClick={() => this.onAppBodyClick()} 
+                    className={`App-body ${(this.state.showingModal || this.state.showingSidebar) ? 'blur' : ''}`}>
                     {this.state.loading &&
                         <p>Loading</p>
                     }

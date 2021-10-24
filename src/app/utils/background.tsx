@@ -1,6 +1,3 @@
-import { Amount } from "@radixdlt/primitives"
-import { mapEquals } from "@radixdlt/util"
-import BigNumber from "bignumber.js"
 import { Network } from "../../classes/network"
 import { RequestT, SignedTransactionT, TransactionFieldsT } from "../types"
 import { XRD_RRI } from "./utils"
@@ -36,6 +33,20 @@ export function getAddressTokens(address: string): Promise<any> {
 export function getStakedPositions(address: string): Promise<any> {
     return new Promise(async (resolve) => {
         let response = await generateBackgroundRequest("get-staked-positions", { address: address })
+        resolve(response)
+    })
+}
+
+export function getValidators(size: number): Promise<any> {
+    return new Promise(async (resolve) => {
+        let response = await generateBackgroundRequest("get-validators", { size: size })
+        resolve(response)
+    })
+}
+
+export function getPromotedValidators(): Promise<any> {
+    return new Promise(async (resolve) => {
+        let response = await generateBackgroundRequest("get-promoted-validators", {})
         resolve(response)
     })
 }

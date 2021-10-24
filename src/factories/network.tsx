@@ -30,11 +30,17 @@ export default class NetworkFactory implements NetworkFactoryInterface {
         return new Promise((resolve, reject) => { resolve(this.selectedNetwork as Network) })
     }
 
-    setSelectedNetwork(networkToSelect: Network): Promise<void> {
+    setSelectedNetwork(networkToSelect: Network, storage = chrome.storage): Promise<void> {
         return new Promise((resolve, reject) => {
             let found = this.networks.filter((network: Network) => network.name === networkToSelect.name)
-            if(found.length == 1)
+            if(found.length == 1) {
                 this.selectedNetwork = found[0]
+                storage.local.set({ "network": JSON.stringify(this.selectedNetwork) }, () => {
+                    const error = chrome.runtime.lastError;
+                    if (error) return reject(error)
+                    resolve()
+                });
+            }
             resolve()
         })
     }

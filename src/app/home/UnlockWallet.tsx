@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import { Network } from "../../classes/network"
 
 import cerbie from "../img/cerbie.png"
+import Footer from "./components/Footer"
 
 export default function UnlockWallet(props: any) {
     return (
@@ -32,12 +33,7 @@ export default function UnlockWallet(props: any) {
                     <p className="App-link" onClick={() => props.forgotPassword()}>Forgot password</p>
                 </div>
             </div>
-            <div className="footer">
-                <div className="centered-flex">
-                    <p className="small no-margin gray-text-3">CerbyMask v1.1</p>
-                    <p className="small no-margin gray-text-3">Get Support</p>
-                </div>
-            </div>
+            <Footer/>
         </div>
     )
 }

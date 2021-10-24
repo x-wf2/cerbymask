@@ -4,30 +4,32 @@ import { formatAddress, formatBigNumber, validateAddress } from "../../utils/for
 import { SignedTransactionT, TransactionFieldsT } from "../../types"
 import { finalizeTransaction, startNewTransaction } from "../../utils/background"
 import { AccountT, SignatureT } from "@radixdlt/application"
-import { clearInterval } from "timers"
 
 let counter: any
 
 export default function ConfirmSendFunds(props: any) {
 
+    let [error, setError] = useState("")
     let [count, setCount] = useState(8);
+    let [finished, setFinished] = useState(false);
+
     let decrement = () => {
+        if(finished) return clearTimer()
         setCount(count => count-1)
         count--
-        if(count >= 1)
-            counter = setTimeout(() => decrement(), 1000)
-        else
-            onCancelTransaction()
+        if(count <= 0) return onCancelTransaction()
     }
 
     function clearTimer() {
-        clearTimeout(counter)
+        window.clearInterval(counter)
         counter = undefined
+        setFinished(true)
     }
 
     useEffect(() => {
-        if(!counter)
-            counter = setTimeout(() => decrement(), 1000)
+        if(!counter) {
+            counter = setInterval(() => decrement(), 1000)
+        }
     })
 
     function onCancelTransaction() {
@@ -51,12 +53,15 @@ export default function ConfirmSendFunds(props: any) {
             const transactionResponse = await finalizeTransaction(transactionPayload)
             if (transactionResponse)
                 props.onTransactionFinish(transactionResponse)
+            else
+                setError("Unable to finalize transaction")
         })
     }
 
     return (
         <div className="modal-form-container">
             <h1 className="normal-1">Confirm Send Funds</h1>
+            {error && <p className="warn-save-title no-margin small">{error}</p>}
             {props.wallet && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
                 <div className="modal-form-column-centered">
                     <div className="centered-flex">

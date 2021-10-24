@@ -14,16 +14,18 @@ export interface WalletFactoryInterface {
 }
 
 export default class LocalWalletFactory implements WalletFactoryInterface {
-    restoreViewingAddress(): Promise<void> {
+    constructor() {}
+
+    restoreViewingAddress(storage = chrome.storage): Promise<void> {
         return new Promise((resolve) => {
-            chrome.storage.local.set({ "addresses": 2 })
-            chrome.storage.local.set({ "address": 0 })
+            storage.local.set({ "addresses": 2 })
+            storage.local.set({ "address": 0 })
             resolve()
         })
     }
-    getViewingAddress(): Promise<number> {
+    getViewingAddress(storage = chrome.storage): Promise<number> {
         return new Promise((resolve) => {
-            chrome.storage.local.get(["address"], async (address) => {
+            storage.local.get(["address"], async (address: any) => {
                 try {
                     const error = chrome.runtime.lastError;
                     if (error) throw Error
@@ -35,16 +37,16 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             })
         })
     }
-    saveViewingAddress(index: number): Promise<void> {
+    saveViewingAddress(index: number, storage = chrome.storage): Promise<void> {
         return new Promise((resolve, reject) => {
-            chrome.storage.local.get(["addresses"], (addresses) => {
+            storage.local.get(["addresses"], (addresses: any) => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
 
                 if ((index + 1) > addresses["addresses"])
-                    chrome.storage.local.set({ "addresses": (index + 1) })
+                    storage.local.set({ "addresses": (index + 1) })
 
-                chrome.storage.local.set({ "address": index }, () => {
+                storage.local.set({ "address": index }, () => {
                     const error = chrome.runtime.lastError;
                     if (error) return reject(error)
                     resolve()
@@ -52,16 +54,16 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             })
         })
     }
-    monitorAddresses(addresses: AccountT[]): Promise<void> {
+    monitorAddresses(addresses: AccountT[], storage = chrome.storage): Promise<void> {
         return new Promise((resolve, reject) => {
-            chrome.storage.local.get(["monitor"], (monitor) => {
+            storage.local.get(["monitor"], (monitor: any) => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
 
                 let addressesString = addresses.map(account => account.address.toString())
                 monitor["monitor"] = addressesString
 
-                chrome.storage.local.set({ "monitor": monitor["monitor"] }, () => {
+                storage.local.set({ "monitor": monitor["monitor"] }, () => {
                     const error = chrome.runtime.lastError;
                     if (error) return reject(error)
                     resolve()
@@ -69,40 +71,40 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
             })
         })
     }
-    saveWallet(keystore: KeystoreT, wallet: Wallet): Promise<void> {
+    saveWallet(keystore: KeystoreT, wallet: Wallet, storage = chrome.storage): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
             const json = JSON.stringify(keystore, null, '\t')
 
-            chrome.storage.local.set({ "keystore": keystore }, () => {
+            storage.local.set({ "keystore": keystore }, () => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
                 resolve()
             });
         });
     }
-    newWallet(): Promise<Wallet> {
+    newWallet(storage = chrome.storage): Promise<Wallet> {
         return new Promise<Wallet>(async (resolve) => {
-            await chrome.storage.local.set({ "keystore": undefined });
-            await chrome.storage.local.set({ "address": 0 });
-            await chrome.storage.local.set({ "addresses": 2 });
-            await chrome.storage.local.set({ "currency": "USD" });
-            await chrome.storage.local.set({ "monitor": [] });
+            await storage.local.set({ "keystore": undefined });
+            await storage.local.set({ "address": 0 });
+            await storage.local.set({ "addresses": 2 });
+            await storage.local.set({ "currency": "USD" });
+            await storage.local.set({ "monitor": [] });
             resolve(new Wallet())
         });
     }
-    getWallet(): Promise<Wallet> {
+    getWallet(storage = chrome.storage): Promise<Wallet> {
         return new Promise(async (resolve) => {
             let wallet: Wallet
 
             // Keystore
-            chrome.storage.local.get(["keystore"], async (keystore) => {
+            storage.local.get(["keystore"], async (keystore: any) => {
                 try {
                     const error = chrome.runtime.lastError;
                     if (error || typeof keystore["keystore"] === 'undefined') throw Error
 
-                    chrome.storage.local.get(["address"], async (address) => {
-                        chrome.storage.local.get(["addresses"], async (addresses) => {
-                            chrome.storage.local.get(["currency"], async (currency) => {
+                    storage.local.get(["address"], async (address: any) => {
+                        storage.local.get(["addresses"], async (addresses: any) => {
+                            storage.local.get(["currency"], async (currency: any) => {
                                 wallet = new Wallet()
                                 wallet.key = Wallet.newKey()
 
