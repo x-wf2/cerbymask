@@ -32,6 +32,10 @@ export type ValidatorT = Readonly<{
     validatorFee: string;
 }>
 
-export type PromotedValidatorT = Readonly<{
-    address: string;
+export type PromotedValidatorT = ValidatorT;
+
+export type StakeT = Readonly<{
+    from: string,
+    validator: string,
+    amount: string,
 }>

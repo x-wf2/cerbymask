@@ -122,7 +122,7 @@ export default function ShowWallet(props: any) {
                         </div>
                         Send
                     </button>
-                    <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_STAKE_FUNDS)}>
+                    <button className="show-wallet-main-action-button" type="button" onClick={() => {props.refreshValidators(); props.showModal(TYPE_STAKE_FUNDS)}}>
                         <div className="show-wallet-main-action-circle">
                             <LockAlt width="16px" />
                         </div>

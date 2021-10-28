@@ -101,3 +101,55 @@ export const formatBigNumber = (x: BigNumber, showFull = false, format: BigNumbe
     return z.toFormat(format)
 }
 
+export function handleKeyDown(e: any, amount: any, token:any, props: any, min=-1) {
+    const field = e.target.name;
+    const futureAmount = `${amount}${e.key}`
+
+    if (field === "amount") {
+        try {
+            let valid = validateAmount(futureAmount, token, props, () => {}, min)
+            console.log("valid")
+            console.log(valid)
+            if(!valid) {
+                e.preventDefault()
+                return
+            }
+        }
+        catch (error) {
+            e.preventDefault()
+            return;
+        }
+    }
+}
+
+export function validateAmount(amount: string, token: any, props: any, setErrors: any, min=-1) {
+    console.log("validateAmount")
+    console.log(amount)
+    console.log(token)
+    console.log(min)
+    const currBalance = new BigNumber((token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()) :
+        (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount)))
+
+    let parsedAmount = -1
+    try {
+        parsedAmount = parseFloat(amount)
+    }
+    catch (e) { return false }
+    if (amount === "") { // VAZIO
+        setErrors((errors: any) => ({ ...errors, amount: "Please insert an amount." }))
+        return false
+    }
+    else if (currBalance.shiftedBy(-18).isLessThan(parsedAmount)) {
+        setErrors((errors: any) => ({ ...errors, amount: "Amount is higher than balance." }))
+        return false
+    }
+    else if (min > 0 && new BigNumber(parsedAmount).isLessThan(min)) {
+        setErrors((errors: any) => ({ ...errors, amount: "Amount is lower than allowed." }))
+        return false
+    }
+    else if (parsedAmount <= 0) {
+        setErrors((errors: any) => ({ ...errors, amount: "Amount is invalid." }))
+        return false
+    }
+    return true
+}

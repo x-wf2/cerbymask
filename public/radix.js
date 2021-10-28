@@ -97,7 +97,7 @@ async function handleGetTokenInfo(request, reply) {
 async function handleStakedPositions(request, reply) {
     const address = request.data.address
     const canUpdate = request.data.canUpdate || false
-    if (!WalletStakeValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletStakeValueCache[address].lastUpdate)) > 20000)) {
+    if (!WalletStakeValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletStakeValueCache[address].lastUpdate)) > 5000)) {
         const rawResponse = await getData("account.get_stake_positions", { "address": address })
         const content = await rawResponse.json();
         WalletStakeValueCache[address] = {
@@ -145,7 +145,7 @@ async function handleGetWalletFunds(request, reply) {
 
 async function handleBuildTransaction(request, reply) {
     let transaction = request.data.transaction
-    transaction.type = "TokenTransfer"
+    transaction.type = request.data.type
 
     const transactionPayload = { "actions": [transaction], "feePayer": transaction.from }
     const rawResponse = await getData("construction.build_transaction", transactionPayload, "construction")
@@ -187,6 +187,9 @@ async function getData(method, params, endpoint = "archive") {
     
     if (!currentNetwork || Object.keys(currentNetwork).length == 0)
         currentNetwork = await refreshNetwork()
+    
+    console.log("getData")
+    console.log(currentNetwork)
 
     let url = currentNetwork.url
 

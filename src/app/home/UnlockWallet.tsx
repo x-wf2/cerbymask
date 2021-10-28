@@ -1,7 +1,6 @@
 import React, { useEffect } from "react"
 import { Network } from "../../classes/network"
 
-import cerbie from "../img/cerbie.png"
 import Footer from "./components/Footer"
 
 export default function UnlockWallet(props: any) {

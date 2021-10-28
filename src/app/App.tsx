@@ -121,8 +121,9 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             onNetworkChange: async (e: any) => {
                 const name = e.target.value
                 const network = (await this.networkFactory.getNetwork(name))[0]
-                this.networkFactory.setSelectedNetwork(network)
-                setBackgroundNetwork(network)
+                await this.networkFactory.setSelectedNetwork(network)
+                await setBackgroundNetwork(network)
+                this.refreshValidators()
             },
             onSidebarOpen: (opened: boolean) => {
                 this.setState(state => ({...state, showingSidebar: opened}))
@@ -133,7 +134,6 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async componentDidMount() {
         const network = (await this.networkFactory.getNetwork("MAINNET"))[0]
         await setBackgroundNetwork(network)
-        this.refreshValidators()
         this.refreshWallet()
     }
 
@@ -196,12 +196,13 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async refreshValidators() {
         let radixValidators = (await getValidators(200)).validators as ValidatorT[]
         let cerbyPromotedValidators = (await getPromotedValidators()) as PromotedValidatorT[]
-        let promotedValidators = radixValidators.filter((validator) => {
-            const results = cerbyPromotedValidators.filter((promotedAddress) => {
-                return validator.address.indexOf(promotedAddress.address) != -1
-            })
-            return results.length > 0
-        })
+        // let promotedValidators = (this.networkFactory.selectedNetwork?.name == "MAINNET" ? radixValidators.filter((validator) => {
+        //     const results = cerbyPromotedValidators.filter((promotedAddress) => {
+        //         return validator.address.indexOf(promotedAddress.address) != -1
+        //     })
+        //     return results.length > 0
+        // }) : radixValidators)
+        let promotedValidators = (radixValidators)
         this.setState((state) => ({ ...state, promotedValidators: promotedValidators }))
         console.log(promotedValidators)
     }
@@ -270,6 +271,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                         <ShowWallet
                             wallet={this.state.wallet}
                             onAddressChange={this.state.onAddressChange}
+                            refreshValidators={() => this.refreshValidators()}
                             showModal={(type: number) => this.showModal(type)}
                             closeModal={() => this.closeModal()}>
                         </ShowWallet>

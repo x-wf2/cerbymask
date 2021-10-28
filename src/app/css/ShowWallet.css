@@ -132,21 +132,21 @@
 }
 
 .input-select-funds {
-    min-width: 144px;
-    padding-left: 12px!important;
+    padding-right: 24px!important;
+    padding-left: 38px!important;
+    width: -webkit-fill-available!important;
 }
 
 .input-amount-funds {
-    padding-left: 13px!important;
-    max-width: 133px!important;
-    min-width: 133px;
+    padding-right: 24px!important;
+    padding-left: 38px!important;
+    width: -webkit-fill-available!important;
 }
 
 .input-to-funds {
-    padding-left: 13px!important;
-    padding-right: 13px!important;
-    max-width: 122px!important;
-    min-width: 122px;
+    padding-right: 24px!important;
+    padding-left: 24px!important;
+    width: -webkit-fill-available!important;
 }
 
 .info-send-funds-title {

@@ -1,5 +1,6 @@
 import { Network } from "../../classes/network"
-import { RequestT, SignedTransactionT, TransactionFieldsT } from "../types"
+import { Wallet } from "../../classes/wallet"
+import { RequestT, SignedTransactionT, StakeT, TransactionFieldsT } from "../types"
 import { XRD_RRI } from "./utils"
 
 export function getCurrentXRDUSDValue(): Promise<any> {
@@ -60,7 +61,7 @@ export function setNetwork(network: Network) {
 
 export function startNewTransaction(transaction: TransactionFieldsT) {
     return new Promise(async (resolve, reject) => {
-        let response = await generateBackgroundRequest("build-transaction", { transaction: transaction })
+        let response = await generateBackgroundRequest("build-transaction", { transaction: transaction, type: "TokenTransfer" })
         resolve(response)
     })
 }
@@ -68,6 +69,13 @@ export function startNewTransaction(transaction: TransactionFieldsT) {
 export function finalizeTransaction(transaction: SignedTransactionT) {
     return new Promise(async (resolve, reject) => {
         let response = await generateBackgroundRequest("finalize-transaction", { transaction: transaction })
+        resolve(response)
+    })
+}
+
+export function startNewStake(stake: StakeT) {
+    return new Promise(async (resolve, reject) => {
+        let response = await generateBackgroundRequest("build-transaction", { transaction: stake, type: "StakeTokens" })
         resolve(response)
     })
 }

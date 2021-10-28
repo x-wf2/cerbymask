@@ -5,19 +5,20 @@ import { SignedTransactionT, TransactionFieldsT } from "../../types"
 import { finalizeTransaction, startNewTransaction } from "../../utils/background"
 import { AccountT, SignatureT } from "@radixdlt/application"
 
+let INITIAL_COUNT = 8
 let counter: any
 
 export default function ConfirmSendFunds(props: any) {
 
     let [error, setError] = useState("")
-    let [count, setCount] = useState(8);
+    let [count, setCount] = useState(INITIAL_COUNT);
     let [finished, setFinished] = useState(false);
 
     let decrement = () => {
         if(finished) return clearTimer()
+        if(count < 1) return onCancelTransaction()
         setCount(count => count-1)
         count--
-        if(count <= 0) return onCancelTransaction()
     }
 
     function clearTimer() {
@@ -28,6 +29,8 @@ export default function ConfirmSendFunds(props: any) {
 
     useEffect(() => {
         if(!counter) {
+            count = INITIAL_COUNT
+            setCount(INITIAL_COUNT)
             counter = setInterval(() => decrement(), 1000)
         }
     })
@@ -64,10 +67,10 @@ export default function ConfirmSendFunds(props: any) {
             {error && <p className="warn-save-title no-margin small">{error}</p>}
             {props.wallet && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
                 <div className="modal-form-column-centered">
-                    <div className="centered-flex">
+                    <div className="centered-flex w-100">
                         <p className="info-password-title info-send-funds-title small no-margin">Token:</p>
-                        <div className="info-content-wrapper">
-                            <select disabled className="input-password input-select-funds w-100 small">
+                        <div className="info-content-wrapper w-100">
+                            <select disabled className="input-password input-select-funds small">
                                 {props.transaction.token == 0 &&
                                     <option>
                                         xrd
@@ -82,29 +85,29 @@ export default function ConfirmSendFunds(props: any) {
                             </select>
                         </div>
                     </div>
-                    <div className="centered-flex margin-t-1">
+                    <div className="centered-flex margin-t-1 w-100">
                         <p className="info-password-title small info-send-funds-title no-margin">Amount:</p>
-                        <div className="info-content-wrapper">
+                        <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
                                 defaultValue={formatBigNumber(new BigNumber(props.transaction.amount))}
-                                className="input-password input-amount-funds w-100 small"
+                                className="input-password input-amount-funds small"
                                 type="number"
                                 name="amount"></input>
                         </div>
                     </div>
-                    <div className="centered-flex margin-t-1">
+                    <div className="centered-flex margin-t-1 w-100">
                         <p className="info-password-title small info-send-funds-title no-margin">To:</p>
-                        <div className="info-content-wrapper">
+                        <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
                                 defaultValue={formatAddress(props.transaction.to)}
                                 name="to"
-                                className="input-password input-to-funds w-100 small"
+                                className="input-password input-to-funds small"
                                 type="text"></input>
                         </div>
                     </div>
-                    <div className="centered-flex-row justify-content-center gap-m-1 margin-t-1 w-100">
+                    <div className="centered-flex-row justify-content-evenly gap-m-1 margin-t-1 w-100">
                         <div>
                             <p className="info-password-title small info-send-funds-title no-margin">Fee:</p>
                             <div className="info-content-wrapper">
@@ -118,7 +121,7 @@ export default function ConfirmSendFunds(props: any) {
                             </div>
                         </div>
                     </div>
-                    <div className="info-content-actions d-flex justify-content-center gap-m-1">
+                    <div className="info-content-actions d-flex justify-content-evenly gap-m-1">
                         <button className="button-normal darker-background" onClick={onCancelTransaction}>
                             Cancel ({count})
                         </button>

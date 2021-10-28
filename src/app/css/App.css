@@ -38,7 +38,7 @@ button {
   padding-right: 16px;
   font-size: calc(20px + 2vmin);
   color: #282c34;
-  box-shadow: 0px 0px 6px #282c34;
+  /* box-shadow: 0px 0px 6px #282c34; */
 }
 
 .App-title {
@@ -75,7 +75,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 33.5rem;
+  min-height: 33.8rem;
 }
 
 .full-height-container {
@@ -220,6 +220,14 @@ button {
   margin: 0;
 }
 
+.no-padding-x {
+  padding-left: 0px!important;
+  padding-right: 0px!important;
+}
+
+.margin-t-09 {
+  margin-top: 11px;
+}
 .margin-t-1 {
   margin-top: 19px;
 }
@@ -287,6 +295,14 @@ button {
   width: 100% !important;
 }
 
+.w-50  {
+  width: 50% !important;
+}
+
+.h-100 {
+  max-height: 400px;
+}
+
 .blue-text {
   color: #003057;
 }
@@ -316,6 +332,18 @@ button {
   top: 136px;
 }
 
+.choose-validator-top {
+  top: 85px;
+}
+
+.choose-validator-confirm-top {
+  top: 95px;
+}
+
+.choose-validator-confirm-2-top {
+  top: 70px;
+}
+
 .send-funds-confirm-top {
   top: 89px;
 }
@@ -332,8 +360,20 @@ button {
   justify-content: center;
 }
 
+.justify-content-evenly {
+  justify-content: space-evenly;
+}
+
 .footer {
   position: absolute;
   bottom: 35px;
   width: 100%;
+}
+
+.loader-container {
+  min-height: 61px;
+  position: relative;
+  left: -6px;
+  margin-bottom: 27px;
+  margin-top: 24px;
 }
