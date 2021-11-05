@@ -3,6 +3,9 @@
     <h1 style="margin-top: -20px;text-align: center;border-bottom: none;">CerbyMask</h1>
     <p style="margin-top: -20px;font-size:10px;text-align: center;border-bottom: none;">A Radix Protocol Lightweight Wallet</p>
 </p>
+<p align="center">
+<a>https://cerbymask.io</a> - <a>https://t.me/cerbymask</a>
+</p>
 
 # 🚀 Features
 - Fully Chrome Based Extension
