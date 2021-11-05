@@ -97,7 +97,6 @@ export default function SendFunds(props: any) {
                                 min="0"
                                 step="1"
                                 onChange={handleInputChange}
-                                onKeyPress={(e) => handleKeyDown(e, fields.amount, token, props)}
                                 name="amount"
                                 placeholder={`Max: ${token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && formatBigNumber(new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()).shiftedBy(-18)) || 0) :
                                     (props.wallet.selectedAddress < props.wallet.radixTokens.length && formatBigNumber(new BigNumber(props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount).shiftedBy(-18)))}`}></input>
