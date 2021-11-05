@@ -2,7 +2,7 @@
   "short_name": "CerbyMask",
   "name": "CerbyMask",
   "description": "A Radix Protocol Lightweight Wallet",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "manifest_version": 3,
   "icons": {
     "16": "android-chrome-192x192.png",
@@ -21,8 +21,7 @@
   "host_permissions": [
     "https://mainnet.radixdlt.com/*",
     "https://stokenet.radixdlt.com/*",
-    "https://api.bitfinex.com/*",
-    "https://api.npoint.io/*"
+    "https://api.bitfinex.com/*"
   ],
   "background": {
     "service_worker": "radix.js"

@@ -195,16 +195,8 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
 
     async refreshValidators() {
         let radixValidators = (await getValidators(200)).validators as ValidatorT[]
-        let cerbyPromotedValidators = (await getPromotedValidators()) as PromotedValidatorT[]
-        // let promotedValidators = (this.networkFactory.selectedNetwork?.name == "MAINNET" ? radixValidators.filter((validator) => {
-        //     const results = cerbyPromotedValidators.filter((promotedAddress) => {
-        //         return validator.address.indexOf(promotedAddress.address) != -1
-        //     })
-        //     return results.length > 0
-        // }) : radixValidators)
         let promotedValidators = (radixValidators)
         this.setState((state) => ({ ...state, promotedValidators: promotedValidators }))
-        console.log(promotedValidators)
     }
 
     onAppBodyClick() {
