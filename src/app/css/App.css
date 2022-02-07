@@ -26,6 +26,7 @@ button {
   display: flex;
   flex-direction: column;
   font-family: "IBM Plex Sans", sans-serif;
+  overflow-y: hidden;
 }
 
 .App-header {
@@ -75,13 +76,14 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 33.8rem;
+  min-height: 33.7rem;
 }
 
 .full-height-container {
-  min-height: 32.8rem;
+  min-height: 32.7rem;
   display: flex;
   flex-direction: column;
+  overflow-y:hidden;
 }
 
 .App-link {
@@ -136,6 +138,7 @@ button {
 .warn-save-text {
   color: #282c34;
   font-size: 22px;
+  word-break: break-word;
 }
 
 .warn-content-wrapper {
@@ -201,11 +204,11 @@ button {
 }
 
 .dark-background {
-  background-color: rgb(50, 54, 77)!important;
+  background-color: #000E28!important;
 }
 
 .darker-background {
-  background-color: rgb(50, 54, 77)!important;
+  background-color: #000E28!important;
 }
 
 .strong-1 {
@@ -344,6 +347,10 @@ button {
   top: 70px;
 }
 
+.confirm-clear-wallet-top {
+  top: 125px;
+}
+
 .send-funds-confirm-top {
   top: 89px;
 }
@@ -353,6 +360,10 @@ button {
 }
 
 .d-flex {
+  display: flex;
+}
+
+.d-flex-column {
   display: flex;
 }
 
@@ -376,4 +387,13 @@ button {
   left: -6px;
   margin-bottom: 27px;
   margin-top: 24px;
+}
+
+.blur-text {
+  text-shadow: 0 0 32px black;
+  color: transparent;
+}
+
+.dark-red-text {
+  color: #901000;
 }
