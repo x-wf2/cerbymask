@@ -55,7 +55,8 @@ interface ICerbieState {
 
 export default class App extends Component<ICerbieProps, ICerbieState> {
 
-    networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
+    // networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
+    networkFactory = new NetworkFactory(([NETWORKS.MAINNET]), NETWORKS.MAINNET);
 
     constructor(props: any) {
         super(props)
@@ -131,7 +132,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 this.setState(state => ({...state, showingSidebar: opened}))
             },
             onClearWallet: async () => {
-                console.log("Clearing wallet")
+                await chrome.storage.local.clear();
                 await this.state.provider.newWallet()
                 this.state.wallet.unlocked = false
                 this.state.wallet.key = undefined

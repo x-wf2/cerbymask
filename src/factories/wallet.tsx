@@ -82,7 +82,6 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
     }
     newWallet(storage = chrome.storage): Promise<Wallet> {
         return new Promise<Wallet>(async (resolve) => {
-            await storage.local.clear();
             await storage.local.set({ "keystore": undefined });
             await storage.local.set({ "address": 0 });
             await storage.local.set({ "addresses": 2 });
