@@ -1,6 +1,5 @@
 import { Wallet } from "../classes/wallet"
 import { KeystoreT } from '@radixdlt/crypto'
-import { SigningKeychainT } from "@radixdlt/account";
 import { AccountT } from "@radixdlt/application";
 
 export interface WalletFactoryInterface {
@@ -57,6 +56,7 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
     monitorAddresses(addresses: AccountT[], storage = chrome.storage): Promise<void> {
         return new Promise((resolve, reject) => {
             storage.local.get(["monitor"], (monitor: any) => {
+
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
 

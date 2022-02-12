@@ -1,5 +1,4 @@
-import { AccountAddressT } from "@radixdlt/account";
-import { WalletT as RadixWalletT, Wallet as RadixWallet, AccountT } from "@radixdlt/application";
+import { WalletT as RadixWalletT, AccountT } from "@radixdlt/application";
 import Key from "./key";
 import { Network } from "./network";
 
@@ -11,7 +10,7 @@ export type WalletBalanceT = Readonly<{
 
 export type WalletTokensT = Readonly<{
     address: string,
-    tokens: [],
+    tokens: [any],
 }>
 
 export type WalletStakeT = Readonly<{

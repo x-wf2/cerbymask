@@ -1,14 +1,26 @@
 import React, { useEffect, useState } from "react"
 import BigNumber from "bignumber.js"
-import { formatAddress, formatBigNumber, validateAddress } from "../../utils/formatters"
-import { SignedTransactionT, TransactionFieldsT } from "../../types"
-import { finalizeTransaction, startNewTransaction } from "../../utils/background"
+import { formatAddress, formatBigNumber } from "../../utils/formatters"
+import { UnsignedTransactionT, SignedTransactionT, TransactionFieldsT } from "../../types"
+import { finalizeTransaction } from "../../utils/background"
+import { XRD_RRI } from "../../utils/utils"
 import { AccountT, SignatureT } from "@radixdlt/application"
+import { Wallet } from "../../../classes/wallet"
 
 let INITIAL_COUNT = 8
 let counter: any
 
-export default function ConfirmSendFunds(props: any) {
+
+export interface IProps {
+    confirmTransaction: UnsignedTransactionT;
+    transaction: TransactionFieldsT;
+    wallet: Wallet;
+    onDisapproveTransaction: Function;
+    onTransactionFinish: Function;
+}
+
+
+export default function ConfirmSendFunds(props: IProps) {
 
     let [error, setError] = useState("")
     let [count, setCount] = useState(INITIAL_COUNT);
@@ -37,23 +49,25 @@ export default function ConfirmSendFunds(props: any) {
 
     function onCancelTransaction() {
         clearTimer()
+        console.log("props.transaction")
+        console.log(props.transaction)
         props.onDisapproveTransaction()
     }
 
     async function onSendTransaction() {
         clearTimer()
-        const blob = props.confirmTransaction.transaction.blob
-        const hashOfBlobToSign = props.confirmTransaction.transaction.hashOfBlobToSign
+        const blob = props.confirmTransaction.payload_to_sign
 
         let currentAccount = props.wallet.radixPublicAddresses[props.wallet.selectedAddress] as AccountT
-        const signed = await currentAccount.sign(props.confirmTransaction.transaction, undefined)
+        const signed = currentAccount.sign({ hashOfBlobToSign: blob } as any, undefined)
 
         signed.forEach(async (item) => {
             let der = item.toDER();
             let pubKey = currentAccount.publicKey.__hex
 
-            const transactionPayload = { blob: blob, publicKeyOfSigner: pubKey, signatureDER: der } as SignedTransactionT
+            const transactionPayload = { unsigned_transaction: props.confirmTransaction.unsigned_transaction, pubKey: pubKey, bytes: der } as SignedTransactionT
             const transactionResponse = await finalizeTransaction(transactionPayload)
+
             if (transactionResponse)
                 props.onTransactionFinish(transactionResponse)
             else
@@ -90,7 +104,7 @@ export default function ConfirmSendFunds(props: any) {
                         <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
-                                defaultValue={formatBigNumber(new BigNumber(props.transaction.amount))}
+                                defaultValue={props.transaction.amount}
                                 className="input-password input-amount-funds small"
                                 type="number"
                                 name="amount"></input>
@@ -111,13 +125,21 @@ export default function ConfirmSendFunds(props: any) {
                         <div>
                             <p className="info-password-title small info-send-funds-title no-margin">Fee:</p>
                             <div className="info-content-wrapper">
-                                <p className="info-password-title green-text small info-send-funds-title no-margin">{`${props.confirmTransaction.fee != "" ? formatBigNumber(new BigNumber(props.confirmTransaction.fee).shiftedBy(-18)) : ""} XRD`}</p>
+                                <p className="info-password-title green-text small info-send-funds-title no-margin">{`${props.confirmTransaction.fee.value != "" ? formatBigNumber(new BigNumber(props.confirmTransaction.fee.value).shiftedBy(-18)) : ""} XRD`}</p>
                             </div>
                         </div>
                         <div>
                             <p className="info-password-title small info-send-funds-title no-margin">Total:</p>
                             <div className="info-content-wrapper">
-                                <p className="info-password-title green-text small info-send-funds-title no-margin">{`${props.confirmTransaction.fee != "" ? formatBigNumber(new BigNumber(props.confirmTransaction.fee).shiftedBy(-18).plus(new BigNumber(props.transaction.amount))) : ""} XRD`}</p>
+                                {XRD_RRI.indexOf(props.transaction.rri) != -1 &&
+                                    <p className="info-password-title green-text small info-send-funds-title no-margin">{`${props.confirmTransaction.fee.value != "" ? formatBigNumber(new BigNumber(props.confirmTransaction.fee.value).shiftedBy(-18).plus(new BigNumber(props.transaction.amount))) : ""} XRD`}</p>
+                                }
+                                {XRD_RRI.indexOf(props.transaction.rri) == -1 &&
+                                    <div>
+                                        <p className="info-password-title green-text small info-send-funds-title no-margin">{`${formatBigNumber(new BigNumber(props.confirmTransaction.fee.value).shiftedBy(-18))} XRD`}</p>
+                                        <p className="info-password-title green-text small info-send-funds-title no-margin">{`${formatBigNumber(new BigNumber(props.transaction.amount))} ${props.transaction.rri.split("_")[0].toString().toUpperCase()}`}</p>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

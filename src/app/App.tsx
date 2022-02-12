@@ -1,11 +1,12 @@
 import React, { Component, ReactNode } from 'react';
 import { LocalProvider, Provider } from '../providers/local';
-import { Wallet, WalletBalanceT } from '../classes/wallet';
+import { Wallet } from '../classes/wallet';
 import NoWalletsFound from './home/NoWalletsFound';
 import GenerateWallet from './home/GenerateWallet';
 import UnlockWallet from './home/UnlockWallet';
 import ShowWallet from './home/ShowWallet';
 import ShowModal from './home/ShowModal';
+
 import {
     generateWalletWithKeyAndMnemonic,
     getXRDUSDBalances,
@@ -13,7 +14,6 @@ import {
     unlockWallet,
     getStakedPositions,
     getTokenBalances,
-    monitorAddressesForProvider,
     setBackgroundNetwork
 } from './utils/utils';
 
@@ -24,7 +24,8 @@ import NetworkFactory, { NETWORKS } from '../factories/network';
 import { Network } from '../classes/network';
 import Navbar from './home/components/Navbar';
 import { PromotedValidatorT, ValidatorT } from './types';
-import { getPromotedValidators, getValidators } from './utils/background';
+import { getValidators } from './utils/background';
+import Sidebar from './home/components/Sidebar';
 
 interface ICerbieProps {
 }
@@ -55,8 +56,7 @@ interface ICerbieState {
 
 export default class App extends Component<ICerbieProps, ICerbieState> {
 
-    // networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
-    networkFactory = new NetworkFactory(([NETWORKS.MAINNET]), NETWORKS.MAINNET);
+    networkFactory = new NetworkFactory(([NETWORKS.mainnet, NETWORKS.stokenet]), NETWORKS.mainnet);
 
     constructor(props: any) {
         super(props)
@@ -92,7 +92,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
 
                     if (isNewHigh) {
                         let addresses = this.refreshWalletAddresses()
-                        await monitorAddressesForProvider(addresses, this.state.provider)
+                        await this.state.provider.monitorAddresses(addresses)
                     }
                     resolve(true)
                     this.refreshWalletInfo()
@@ -104,7 +104,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 this.setState((state) => ({ wallet: { ...state.wallet, radixWallet: radixWallet } }))
                 this.state.provider.restoreViewingAddress()
                 let addresses = this.refreshWalletAddresses()
-                monitorAddressesForProvider(addresses, this.state.provider)
+                await this.state.provider.monitorAddresses(addresses)
             },
             onCompleteWallet: () => { this.setState((state) => ({ ...state, generating: false, resetting: false, wallet: { ...state.wallet, password: "" } })); this.refreshWallet() },
             onUnlockWallet: async () => {
@@ -117,9 +117,9 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     return
                 }
                 this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixWallet: radixWallet, unlocked: true } }))
-                this.refreshWalletAddresses()
+                let addresses = this.refreshWalletAddresses()
                 await this.refreshWalletInfo()
-                console.log(this.state.wallet)
+                await this.state.provider.monitorAddresses(addresses)
             },
             onNetworkChange: async (e: any) => {
                 const name = e.target.value
@@ -129,7 +129,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 this.refreshValidators()
             },
             onSidebarOpen: (opened: boolean) => {
-                this.setState(state => ({...state, showingSidebar: opened}))
+                this.setState(state => ({ ...state, showingSidebar: opened }))
             },
             onClearWallet: async () => {
                 await chrome.storage.local.clear();
@@ -142,8 +142,6 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     }
 
     async componentDidMount() {
-        const network = (await this.networkFactory.getNetwork("MAINNET"))[0]
-        await setBackgroundNetwork(network)
         this.refreshWallet()
     }
 
@@ -166,14 +164,15 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     async refreshWalletInfo() {
         let addresses = this.state.wallet.radixPublicAddresses
 
+        console.log("refreshWalletInfo() called:")
         let balances = await getXRDUSDBalances(addresses)
         let tokens = await getTokenBalances(addresses)
         let stakes = await getStakedPositions(addresses)
 
-        this.state.wallet.radixBalances = balances
-        this.state.wallet.radixStakes = stakes
-        this.state.wallet.radixTokens = tokens
         this.state.wallet.network = this.networkFactory.selectedNetwork
+
+        console.log("stakes")
+        console.log(stakes)
 
         this.setState((state) => ({
             ...state,
@@ -184,6 +183,8 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 radixTokens: tokens
             }
         }))
+        console.log("end of refreshWalletInfo:")
+        console.log(this.state.wallet)
     }
 
     async showModal(type: number) {
@@ -203,14 +204,15 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
     }
 
     async refreshValidators() {
-        let radixValidators = (await getValidators(200)).validators as ValidatorT[]
-        let promotedValidators = (radixValidators)
-        this.setState((state) => ({ ...state, promotedValidators: promotedValidators }))
+        let radixValidators = (await getValidators()) as ValidatorT[]
+        console.log("radixValidators:")
+        console.log(radixValidators)
+        this.setState((state) => ({ ...state, promotedValidators: radixValidators }))
     }
 
     onAppBodyClick() {
-        if(this.state.showingSidebar)
-            this.setState(state => ({...state, showingSidebar: false}))
+        if (this.state.showingSidebar)
+            this.setState(state => ({ ...state, showingSidebar: false }))
     }
 
     render(): ReactNode {
@@ -220,19 +222,28 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     wallet={this.state.wallet}
                     sidebarOpened={this.state.showingSidebar}
                     onSidebarOpen={(opened: any) => this.state.onSidebarOpen(opened)}
-                    showModal={(type: number) => this.showModal(type)}/>
-                <ShowModal
+                    showModal={(type: number) => this.showModal(type)} />
+                <Sidebar
                     wallet={this.state.wallet}
-                    showingModal={this.state.showingModal}
-                    showingForm={this.state.showingForm}
-                    promotedValidators={this.state.promotedValidators}
-                    closeModal={() => this.closeModal()}
-                    showModal={(type: number) => this.showModal(type)}
-                    onClearWallet={() => this.state.onClearWallet()}
-                    refreshWalletInfo={() => this.refreshWalletInfo()}/>
+                    sidebarOpened={this.state.showingSidebar}
+                    onSidebarOpen={(opened: any) => this.state.onSidebarOpen(opened)}
+                    showModal={(type: number) => this.showModal(type)} />
+                {this.state.showingModal &&
+                    <div className="h-100 w-100 centered-flex position-absolute">
+                        <ShowModal
+                            wallet={this.state.wallet}
+                            showingModal={this.state.showingModal}
+                            showingForm={this.state.showingForm}
+                            promotedValidators={this.state.promotedValidators}
+                            closeModal={() => this.closeModal()}
+                            showModal={(type: number) => this.showModal(type)}
+                            onClearWallet={() => this.state.onClearWallet()}
+                            refreshWalletInfo={() => this.refreshWalletInfo()} />
+                    </div>
+                }
                 <div
-                    onClick={() => this.onAppBodyClick()} 
-                    className={`App-body ${(this.state.showingModal || this.state.showingSidebar) ? 'blur' : ''}`}>
+                    onClick={() => this.onAppBodyClick()}
+                    className={`App-body h-100 ${(this.state.showingModal || this.state.showingSidebar) ? 'blur' : ''}`}>
                     {this.state.loading &&
                         <p>Loading</p>
                     }

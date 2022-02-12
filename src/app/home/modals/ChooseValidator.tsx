@@ -19,8 +19,8 @@ export function ChooseValidator(props: any) {
                     <div className="pill-nav h-100 w-100">
                         {props.promotedValidators && props.promotedValidators.map((validator: ValidatorT, index: number) => {
                             return (
-                                <a className="small last" onClick={() => props.onChooseValidator(validator)} key={index} data-name={validator.address}>
-                                    {validator.name} - {validator.validatorFee}% fee
+                                <a className="small last" onClick={() => props.onChooseValidator(validator)} key={index} data-name={validator.validator_identifier.address}>
+                                    {validator.properties.name} - {validator.properties.validator_fee_percentage}% fee
                                 </a>
                             )
                         })}

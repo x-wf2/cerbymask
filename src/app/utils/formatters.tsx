@@ -1,6 +1,7 @@
 import { AmountT } from '@radixdlt/application'
-import BigNumber from 'bignumber.js'
 import { Network } from '../../classes/network'
+import { NETWORKS } from '../../factories/network'
+import BigNumber from 'bignumber.js'
 
 BigNumber.set({
     ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
@@ -8,9 +9,9 @@ BigNumber.set({
 })
 
 export function validateAddress(address: string, network: Network) {
-    if(network.name === "MAINNET" && address.startsWith("rdx"))
+    if(network.name === NETWORKS.mainnet.name && address.startsWith("rdx"))
         return true
-    else if(network.name === "STOKENET" && address.startsWith("tdx"))
+    else if(network.name === NETWORKS.stokenet.name && address.startsWith("tdx"))
         return true
     else
         return false
@@ -108,8 +109,6 @@ export function handleKeyDown(e: any, amount: any, token:any, props: any, min=-1
     if (field === "amount") {
         try {
             let valid = validateAmount(futureAmount, token, props, () => {}, min)
-            console.log("valid")
-            console.log(valid)
             if(!valid) {
                 e.preventDefault()
                 return
@@ -123,12 +122,8 @@ export function handleKeyDown(e: any, amount: any, token:any, props: any, min=-1
 }
 
 export function validateAmount(amount: string, token: any, props: any, setErrors: any, min=-1) {
-    console.log("validateAmount")
-    console.log(amount)
-    console.log(token)
-    console.log(min)
     const currBalance = new BigNumber((token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()) :
-        (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount)))
+        (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].value)))
 
     let parsedAmount = -1
     try {

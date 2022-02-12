@@ -14,7 +14,7 @@ export interface IProps {
     wallet: Wallet,
 }
 
-export function ChooseStakeInputs(props: IProps) {
+export function StakeFunds(props: IProps) {
     let [fields, setFields] = useState({} as StakeT)
     let [errors, setErrors] = useState({} as StakeT)
 
@@ -30,8 +30,6 @@ export function ChooseStakeInputs(props: IProps) {
         let validTransaction = true
         const validAmount = validateAmount(fields.amount, 0, props, setErrors, 90)
 
-        console.log("validAmount")
-        console.log(validAmount)
         if (!validAmount) {
             validTransaction = false
         }
@@ -41,7 +39,8 @@ export function ChooseStakeInputs(props: IProps) {
     
             let tmpFields = { ...fields,
                 from: from,
-                validator: props.selectedValidator.address,
+                rri: props.wallet.network?.xrd_rri,
+                to: props.selectedValidator.validator_identifier.address,
                 amount: new BigNumber(fields.amount).shiftedBy(18).toString(),
             } as StakeT
 
@@ -57,14 +56,14 @@ export function ChooseStakeInputs(props: IProps) {
     return (
         <div className="modal-form-container">
             <h1 className="normal-1">Stake Funds</h1>
-            {props.wallet && props.selectedValidator.name != "" && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
+            {props.wallet && props.selectedValidator.properties.name != "" && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
                 <div className="modal-form-column-centered">
                     <div className="centered-flex w-100">
                         <p className="info-password-title small info-send-funds-title no-margin">Name:</p>
                         <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
-                                defaultValue={props.selectedValidator.name}
+                                defaultValue={props.selectedValidator.properties.name}
                                 className="input-password w-100 small"
                                 type="string"
                                 name="amount"></input>
@@ -76,7 +75,7 @@ export function ChooseStakeInputs(props: IProps) {
                             {errors && errors.validator != "" && <p className="warn-save-title small no-margin">{errors.validator}</p>}
                             <input
                                 disabled={true}
-                                defaultValue={formatAddress(props.selectedValidator.address)}
+                                defaultValue={formatAddress(props.selectedValidator.validator_identifier.address)}
                                 className="input-password w-100 small"
                                 type="string"
                                 name="amount"></input>
@@ -88,7 +87,7 @@ export function ChooseStakeInputs(props: IProps) {
                             <div className="info-content-wrapper">
                                 <input
                                     disabled={true}
-                                    defaultValue={`${props.selectedValidator.validatorFee}%`}
+                                    defaultValue={`${props.selectedValidator.properties.validator_fee_percentage}%`}
                                     className="input-password small w-100"
                                     type="string"
                                     name="amount"></input>
@@ -99,7 +98,7 @@ export function ChooseStakeInputs(props: IProps) {
                             <div className="info-content-wrapper">
                                 <input
                                     disabled={true}
-                                    defaultValue={`${props.selectedValidator.uptimePercentage}%`}
+                                    defaultValue={`${props.selectedValidator.info.uptime.uptime_percentage}%`}
                                     className="input-password small w-100"
                                     type="string"
                                     name="amount"></input>

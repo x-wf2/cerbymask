@@ -1,4 +1,3 @@
-import { nextTick } from "process"
 import React, { useState } from "react"
 
 export default function ForgotPassword(props: any) {

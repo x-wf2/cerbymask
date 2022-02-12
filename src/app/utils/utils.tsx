@@ -2,7 +2,7 @@ import { Wallet, WalletBalanceT, WalletStakeT, WalletTokensT } from "../../class
 import { MnemomicT, KeystoreT, SigningKeychain, SigningKeychainT, Wallet as RadixWallet, WalletT as RadixWalletT, Network as RadixNetwork, AccountT } from '@radixdlt/application'
 import { Provider } from "../../providers/local";
 import { resolve } from "path";
-import { getCurrentXRDUSDValue, getWalletBalance, getStakedPositions as gsp, getAddressTokens, setNetwork } from "./background";
+import { getCurrentXRDUSDValue, getWalletBalance, getStakedPositions as getStakes, getAddressTokens, setNetwork } from "./background";
 import BigNumber from "bignumber.js"
 import { formatBigNumber, numberFormatUSA } from "./formatters";
 import { Network } from "../../classes/network";
@@ -68,7 +68,7 @@ export function unlockWallet(wallet: Wallet, provider: Provider): Promise<RadixW
 
         walletResult.match(
             async (signingKeychain: SigningKeychainT) => {
-                const networkName = (await provider.getCurrentNetwork()).name
+                const networkName = (await provider.getCurrentNetwork()).name.toUpperCase()
                 const radixWallet = RadixWallet.create({
                     signingKeychain: signingKeychain,
                     network: networkName as RadixNetwork,
@@ -82,17 +82,16 @@ export function unlockWallet(wallet: Wallet, provider: Provider): Promise<RadixW
 
 export async function getXRDUSDBalances(radixPublicAddresses: AccountT[]) {
     let xrdValue = (await getCurrentXRDUSDValue())
-
     return Promise.all(radixPublicAddresses.map(async (address) => {
-        let balance = (await getWalletBalance(address?.address.toString()))[0]
-        let usdBalance = new BigNumber(balance?.amount.toString())
+        let balance = (await getWalletBalance(address?.address.toString()))
+
+        let usdBalance = new BigNumber(balance.toString())
             .multipliedBy(parseFloat(xrdValue.bid))
             .shiftedBy(-18).toFixed(4)
         return {
             address: address.address.toString(),
-            rri: !balance ? "" : balance?.rri,
-            xrd: !balance ? new BigNumber(0) : balance?.amount,
-            balance: !balance ? 0 : usdBalance
+            balance: !balance ? 0 : usdBalance,
+            xrd: !balance ? new BigNumber(0) : new BigNumber(balance)
         } as WalletBalanceT
     }))
 }
@@ -112,20 +111,20 @@ export async function getTokenBalances(radixPublicAddresses: AccountT[]) {
 export async function getStakedPositions(radixPublicAddresses: AccountT[]) {
     let xrdValue = (await getCurrentXRDUSDValue())
     return Promise.all(radixPublicAddresses.map(async (address) => {
-        let staked = (await gsp(address?.address.toString())).result
+        let stakedValue = new BigNumber((await getStakes(address?.address.toString())).value)
+        let staked = ""
 
-        var balance = staked.reduce((acc: any, position: any) => new BigNumber(position.amount).plus(acc), 0);
         let usdBalance = ""
-        if (balance) {
-            usdBalance = balance.multipliedBy(parseFloat(xrdValue.bid)).shiftedBy(-18).toFixed(4)
-            balance = formatBigNumber(balance.shiftedBy(-18))
+        if (stakedValue) {
+            usdBalance = stakedValue.multipliedBy(parseFloat(xrdValue.bid)).shiftedBy(-18).toFixed(4)
+            staked = formatBigNumber(stakedValue.shiftedBy(-18))
         }
         return {
             address: address?.address.toString(),
             initial: "string",
             rewards: "string",
             unstaking: "string",
-            staked: balance,
+            staked: staked,
             balance: usdBalance
         } as WalletStakeT
     }))
