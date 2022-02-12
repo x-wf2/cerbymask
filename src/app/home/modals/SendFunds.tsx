@@ -3,6 +3,9 @@ import BigNumber from "bignumber.js"
 import { formatBigNumber, handleKeyDown, validateAddress, validateAmount } from "../../utils/formatters"
 import { TransactionFieldsT } from "../../types"
 import { startNewTransaction } from "../../utils/background"
+import { Wallet } from '../../../classes/wallet';
+import { Network } from "../../../classes/network"
+
 
 export default function SendFunds(props: any) {
 
@@ -28,9 +31,9 @@ export default function SendFunds(props: any) {
 
         let rri = ""
         if (token == 0)
-            rri = (props.wallet.selectedAddress < props.wallet.radixBalances.length && props.wallet.radixBalances[props.wallet.selectedAddress].rri)
+            rri = props.wallet.network.xrd_rri
         else
-            rri = (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].rri)
+            rri = (props.wallet.selectedAddress < props.wallet.radixTokens.length && props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].token_identifier.rri)
 
         let from = ""
         from = (props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length && props.wallet.radixPublicAddresses[props.wallet.selectedAddress].address.toString())
@@ -43,7 +46,7 @@ export default function SendFunds(props: any) {
             validTransaction = false
         }
 
-        const validTo = validateAddress(fields.to, props.wallet.network)
+        const validTo = validateAddress(fields.to, props.wallet.network as Network)
         if (!validTo) {
             setErrors(errors => ({ ...errors, to: "Invalid address" }))
             validTransaction = false
@@ -99,7 +102,7 @@ export default function SendFunds(props: any) {
                                 onChange={handleInputChange}
                                 name="amount"
                                 placeholder={`Max: ${token == 0 ? (props.wallet.selectedAddress < props.wallet.radixBalances.length && formatBigNumber(new BigNumber(props.wallet.radixBalances[props.wallet.selectedAddress].xrd.toString()).shiftedBy(-18)) || 0) :
-                                    (props.wallet.selectedAddress < props.wallet.radixTokens.length && formatBigNumber(new BigNumber(props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].amount).shiftedBy(-18)))}`}></input>
+                                    (props.wallet.selectedAddress < props.wallet.radixTokens.length && formatBigNumber(new BigNumber(props.wallet.radixTokens[props.wallet.selectedAddress].tokens[token - 1].value).shiftedBy(-18)))}`}></input>
                         </div>
                     </div>
                     <div className="centered-flex margin-t-1 w-100">

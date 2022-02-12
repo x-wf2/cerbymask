@@ -12,24 +12,57 @@ export type TransactionFieldsT = Readonly<{
 }>
 
 export type SignedTransactionT = Readonly<{
-    blob: string;
-    publicKeyOfSigner: string;
-    signatureDER: string;
+    unsigned_transaction: string;
+    pubKey: string;
+    bytes: string;
+}>
+
+export type UnsignedTransactionT = Readonly<{
+    fee: {value: string, token_identifier: { rri: string }};
+    payload_to_sign: string;
+    unsigned_transaction: string;
 }>
 
 export type ValidatorT = Readonly<{
-    address: string;
-    infoURL: string;
-    isExternalStakeAccepted: boolean;
-    name: string;
-    ownerAddress: string;
-    ownerDelegation: string;
-    proposalsCompleted: string;
-    proposalsMissed: string;
-    registered: boolean;
-    totalDelegatedStake: string;
-    uptimePercentage: string;
-    validatorFee: string;
+    info: {
+        owner_stake: {
+            value: string,
+            token_identifier: {
+                rri: string
+            }
+        },
+        uptime: {
+            epoch_range: {
+                from: number,
+                to: number
+            }
+            from: number
+            to: number
+            proposals_completed: number
+            proposals_missed: number
+            uptime_percentage: string
+        },
+    },
+    properties: {
+        external_stake_accepted: boolean,
+        name: string
+        owner_account_identifier: {
+            address: string
+        },
+        registered: boolean,
+        url: string
+        validator_fee_percentage: string
+    },
+    stake: {
+        token_identifier: {
+            rri: string
+        }
+        rri: string
+        value: string
+    },
+    validator_identifier: {
+        address: string
+    }
 }>
 
 export type PromotedValidatorT = ValidatorT;

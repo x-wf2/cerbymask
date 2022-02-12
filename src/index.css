@@ -1,6 +1,10 @@
+html, body, #root {
+  height: 100%;
+  overflow-x:hidden;
+}
 body {
-  width: 375px;
-  height: 600px;
+  min-width: 375px;
+  min-height: 600px;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

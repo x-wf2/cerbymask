@@ -1,12 +1,8 @@
-import { Wallet } from "../classes/wallet"
-import { KeystoreT } from '@radixdlt/crypto'
-import { SigningKeychainT } from "@radixdlt/account";
 import { Network } from "../classes/network";
 
-
 export const NETWORKS = {
-    "MAINNET": new Network("MAINNET", "https://mainnet.radixdlt.com/"),
-    "STOKENET": new Network("STOKENET", "https://stokenet.radixdlt.com/")
+    "mainnet": new Network("mainnet", "https://mainnet.radixdlt.com/", "xrd_rr1qy5wfsfh"),
+    "stokenet": new Network("stokenet", "https://stokenet.radixdlt.com/", "xrd_tr1qyf0x76s")
 }
 
 export interface NetworkFactoryInterface {
@@ -35,7 +31,7 @@ export default class NetworkFactory implements NetworkFactoryInterface {
             let found = this.networks.filter((network: Network) => network.name === networkToSelect.name)
             if(found.length == 1) {
                 this.selectedNetwork = found[0]
-                storage.local.set({ "network": JSON.stringify(this.selectedNetwork) }, () => {
+                storage.local.set({ "network": this.selectedNetwork }, () => {
                     const error = chrome.runtime.lastError;
                     if (error) return reject(error)
                     resolve()

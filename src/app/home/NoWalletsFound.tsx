@@ -1,4 +1,3 @@
-import Footer from "./components/Footer"
 
 export default function NoWalletsFound(props: any) {
     return (
@@ -9,7 +8,6 @@ export default function NoWalletsFound(props: any) {
                 <p className="App-link" onClick={() => props.generateWallet()}>Generate a new wallet</p>
                 <p className="App-link" onClick={() => props.forgotPassword()}>Import via seed phrase</p>
             </div>
-            <Footer />
         </div>
     )
 }

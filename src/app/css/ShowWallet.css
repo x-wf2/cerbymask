@@ -29,7 +29,9 @@
 .show-wallet-main-actions-buttons {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    grid-gap: 10px;
+    gap: 26px;
+    min-width: 360px;
 }
 
 .show-wallet-main-action-button {
@@ -43,6 +45,7 @@
     transition: 0.225s color;
     color: rgb(0, 48, 87, 0.7);
     width: 16%;
+    max-width: 100px;
 }
 
 .show-wallet-main-action-circle {
@@ -74,6 +77,7 @@
     display:flex;
     flex-wrap: wrap;
     row-gap: 10px;
+    padding-bottom: 25px;
 }
 
 .show-wallet-chart-container {
@@ -82,7 +86,7 @@
     align-items: center;
 }
 
-.show-wallet-choose-address {
+.show-wallet-choose-address, .show-wallet-choose-network {
     border: 0;
     background-color: #f2f2fc;
     color: rgba(0,48,87,.5);
@@ -90,6 +94,11 @@
     padding-left: 10px;
     padding-right: 2px;
     font-family: "IBM Plex Sans";
+}
+
+.show-wallet-choose-network {
+    position: relative;
+    top: -24px;
 }
 
 .show-wallet-choose-address-container {
@@ -112,15 +121,17 @@
 .show-tokens-container {
     display: flex;
     justify-content: center;
-    column-gap: 10px;
     width: 100%;
 }
 
 .show-tokens-wrapper {
     width: 100%;
+    column-gap: 10px;
+    row-gap: 19px;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .show-tokens-wrapper div {
@@ -157,10 +168,4 @@
     color: #003057;
     font-size: 20px;
     font-weight: 600;
-}
-
-.show-network-choose-address-container {
-    position: absolute;
-    left: 36.8%;
-    top: 135px;
 }

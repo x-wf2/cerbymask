@@ -1,18 +1,23 @@
 .sidebar-container {
     position: absolute;
-    height: 37.5rem;
-    width: 299px;
     background-color: #14274af5;
-    right: -299px;
-    z-index: 2;
     transition: all .5s;
     align-items: flex-start;
-    margin-top: 540px;
+    z-index: 2;
 }
 
 .opened {
-    transform: translateX(-299px);
+    width: 299px;
+    right: -299px;
     box-shadow: -3px 4px 6px rgb(0 0 0 / 20%);
+    transform: translateX(-299px);
+}
+
+.closed {
+    transform: translateX(299px);
+    right: 299px;
+    width: 0px;
+    overflow-x:hidden;
 }
 
 .sidebar-close {

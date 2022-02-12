@@ -19,21 +19,11 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 })
 
 chrome.runtime.onMessage.addListener((request, sender, reply) => {
-    console.log(request.title)
     if (request.title == "get-wallet-funds") {
         handleGetWalletFunds(request, reply)
     }
     else if (request.title == "get-xrdusd-value") {
         handleGetXRDUSDValue(request, reply)
-    }
-    else if (request.title == "get-staked-positions") {
-        handleStakedPositions(request, reply)
-    }
-    else if (request.title == "get-token-info") {
-        handleGetTokenInfo(request, reply)
-    }
-    else if (request.title == "get-token-info") {
-        handleGetTokenInfo(request, reply)
     }
     else if (request.title == "set-network") {
         handleSetNetwork(request, reply)
@@ -47,28 +37,27 @@ chrome.runtime.onMessage.addListener((request, sender, reply) => {
     else if (request.title == "get-validators") {
         handleGetValidators(request, reply)
     }
-    else if (request.title == "get-promoted-validators") {
-        handleGetPromotedValidators(request, reply)
-    }
     return true;
 });
 
-let currentNetwork = {};
+let currentNetwork = { name: "", url: "" };
 let TokensInfoValueCache = {};
 let WalletStakeValueCache = {};
 let WalletFundsValueCache = {};
 let XRDValueCache = {};
 
 function startMonitoring() {
-
     chrome.storage.local.get(["monitor"], async (monitor) => {
         let addresses = monitor["monitor"]
+        currentNetwork = await refreshNetwork()
         if (addresses) {
             await handleGetXRDUSDValue({ data: { canUpdate: true } }, () => { })
             addresses.map(async (address) => {
-                await handleStakedPositions({ data: { address: address, canUpdate: true } }, () => { })
+                // await handleStakedPositions({ data: { address: address, canUpdate: true } }, () => { })
                 await handleGetWalletFunds({ data: { address: address, canUpdate: true } }, (balances) => {
-                    balances.map(async (item) => await handleGetTokenInfo({ data: { rri: item.rri, canUpdate: true } }, () => { }))
+                    // balances.map(async (item) => await handleGetTokenInfo({ data: { rri: item.rri, canUpdate: true } }, () => { }))
+                    console.log("radix.js handleGetWalletFunds:")
+                    console.log(balances)
                 })
             }, () => { })
         }
@@ -112,7 +101,7 @@ async function handleStakedPositions(request, reply) {
 async function handleGetXRDUSDValue(request, reply) {
     const canUpdate = request.data.canUpdate || false
     const emptyBid = { bid: 0 }
-    if (currentNetwork.name !== "MAINNET") {
+    if (currentNetwork.name.toLowerCase() !== "mainnet") {
         XRDValueCache = {
             response: emptyBid
         }
@@ -133,12 +122,28 @@ async function handleGetXRDUSDValue(request, reply) {
 async function handleGetWalletFunds(request, reply) {
     const address = request.data.address
     const canUpdate = request.data.canUpdate || false
+
+    currentNetwork = await refreshNetwork()
     if (!WalletFundsValueCache[address] || canUpdate && ((Number(new Date()) - Number(WalletFundsValueCache[address].lastUpdate)) > 5000)) {
-        const rawResponse = await getData("account.get_balances", { "address": address })
-        const json = await rawResponse.json()
-        WalletFundsValueCache[address] = {
-            response: json.result.tokenBalances,
-            lastUpdate: new Date()
+        const payload = {
+            "network_identifier": {
+                "network": currentNetwork.name
+            },
+            "account_identifier": {
+                "address": address
+            }
+        }
+
+        const rawResponse = await getData("account/balances", payload)
+        if (rawResponse.status == 200) {
+            const json = await rawResponse.json()
+
+            console.log("account balances json:")
+            console.log(json)
+            WalletFundsValueCache[address] = {
+                response: json.account_balances,
+                lastUpdate: new Date()
+            }
         }
     }
     reply(WalletFundsValueCache[address].response)
@@ -148,67 +153,101 @@ async function handleBuildTransaction(request, reply) {
     let transaction = request.data.transaction
     transaction.type = request.data.type
 
-    const transactionPayload = { "actions": [transaction], "feePayer": transaction.from }
-    const rawResponse = await getData("construction.build_transaction", transactionPayload, "construction")
-
+    const params = {
+        "actions": [
+            {
+                "type": transaction.type,
+                "from_account": {
+                    "address": transaction.from
+                },
+                "amount": {
+                    "token_identifier": {
+                        "rri": transaction.rri
+                    },
+                    "value": transaction.amount
+                }
+            }
+        ],
+        "fee_payer": {
+            "address": transaction.from
+        },
+        "network_identifier": {
+            "network": currentNetwork.name,
+        },
+        "disable_token_mint_and_burn": true
+    }
+    params.actions[0][transaction.type == "TransferTokens" ? "to_account": "to_validator"] = {
+        "address": transaction.to
+    }
+    const rawResponse = await getData("transaction/build", params)
     const json = await rawResponse.json()
-    reply(json.result)
+    reply(json)
 }
 
 async function handleFinalizeTransaction(request, reply) {
     let transaction = request.data.transaction
-    transaction.immediateSubmit = true
 
-    try {
-        const rawResponse = await getData("construction.finalize_transaction", transaction, "construction")
-        const json = await rawResponse.json()
-        reply(json.result)
+    const params = {
+        "network_identifier": {
+            "network": currentNetwork.name
+        },
+        "unsigned_transaction": transaction.unsigned_transaction,
+        "signature": {
+            "bytes": transaction.bytes,
+            "public_key": {
+                "hex": transaction.pubKey
+            }
+        },
+        "submit": true
     }
-    catch(e) {
+    try {
+        const rawResponse = await getData("transaction/finalize", params)
+        const json = await rawResponse.json()
+        reply(json)
+    }
+    catch (e) {
         reply({})
     }
 }
 
 async function handleGetValidators(request, reply) {
-    let size = request.data.size || 25
-    let params = { "size": size }
-    const rawResponse = await getData("validators.get_next_epoch_set", params)
+    let params = {
+        "network_identifier": {
+            "network": currentNetwork.name
+        },
+    }
+    const rawResponse = await getData("validators", params)
     const json = await rawResponse.json()
-    reply(json.result)
+    reply(json)
 }
 
 async function handleGetPromotedValidators(request, reply) {
     const rawResponse = await fetch('https://api.npoint.io/e362e89867d427eba6cf', {})
-    const content = await rawResponse.json();
-    reply(content)
+    if(rawResponse.status == 200) {
+        const content = await rawResponse.json();
+        reply(content)
+    }
 }
 
-async function getData(method, params, endpoint = "archive") {
-    const payload = { "jsonrpc": "2.0", "id": "0", "method": method, "params": params }
-    
+async function getData(endpoint, params) {
     if (!currentNetwork || Object.keys(currentNetwork).length == 0)
         currentNetwork = await refreshNetwork()
-    
-    console.log("getData")
-    console.log(currentNetwork)
 
+    const payload = params
     let url = currentNetwork.url
 
-    // URL Discovery
-    if ('address' in params)
-        url = getNetworkFromAddress(params.address)
-    else if ('feePayer' in params)
-        url = getNetworkFromAddress(params.feePayer)
-
     try {
+        console.log("Sending payload:")
+        console.log(payload)
         const rawResponse = await fetch(`${url}${endpoint}`, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'text/plain'
+                "X-Radixdlt-Target-Gw-Api": "1.1.0",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
         });
+
         return rawResponse
     }
     catch (e) {
@@ -217,29 +256,21 @@ async function getData(method, params, endpoint = "archive") {
     }
 }
 
-function getNetworkFromAddress(address) {
-    let url
-    if (address.startsWith("rdx"))
-        url = "https://mainnet.radixdlt.com/"
-    else if (address.startsWith("tdx"))
-        url = "https://stokenet.radixdlt.com/"
-    return url
-}
-
 function refreshNetwork() {
     return new Promise((resolve) => {
         chrome.storage.local.get(["network"], async (network) => {
             if (network["network"] == undefined)
                 network["network"] = setMainnet()
             currentNetwork = network["network"]
-            resolve(JSON.parse(network["network"]))
-        })  
+
+            resolve(currentNetwork)
+        })
     })
 }
 
 // Set stored network to MAINNET
 function setMainnet() {
-    let mainnet = { name: "MAINNET", url: "https://mainnet.radixdlt.com/" }
+    let mainnet = { name: "mainnet", url: "https://mainnet.radixdlt.com/" }
     chrome.storage.local.set({ "network": mainnet })
     return mainnet
 }

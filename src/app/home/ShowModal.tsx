@@ -9,9 +9,9 @@ import QRCode from "react-qr-code";
 import SendFunds from "./modals/SendFunds"
 import ConfirmSendFunds from "./modals/ConfirmSendFunds"
 import { ChooseValidator } from "./modals/ChooseValidator"
-import { StakeT, ValidatorT } from "../types"
-import { ChooseStakeInputs } from "./modals/ChooseStakeInputs"
-import { ConfirmStakeInputs } from "./modals/ConfirmStakeInputs"
+import { StakeT, TransactionFieldsT, UnsignedTransactionT, ValidatorT } from "../types"
+import { StakeFunds } from "./modals/StakeFunds"
+import { ConfirmStakeFunds } from "./modals/ConfirmStakeFunds"
 import { RevealSeedPhrase } from "./modals/RevealSeedPhrase"
 import { ConfirmClearWallet } from "./modals/ConfirmClearWallet"
 
@@ -29,11 +29,11 @@ export const TYPE_CONFIRM_CLEAR_WALLET  = 8
 
 export default function ShowModal(props: any) {
 
-    let [initialTransaction, setInitialTransaction] = useState({})
-    let [confirmTransaction, setConfirmTransaction] = useState({})
+    let [initialTransaction, setInitialTransaction] = useState({} as TransactionFieldsT)
+    let [confirmTransaction, setConfirmTransaction] = useState({} as UnsignedTransactionT)
     
-    let [selectedValidator, setSelectedValidator] = useState({ name: "", address: "" } as ValidatorT)
-    let [confirmStake, setConfirmStake] = useState({fields: {} as StakeT, reply: {}})
+    let [selectedValidator, setSelectedValidator] = useState({} as ValidatorT)
+    let [confirmStake, setConfirmStake] = useState({fields: {} as StakeT, reply: {} as UnsignedTransactionT})
 
     function onDisapproveTransaction() {
         props.showModal(TYPE_SEND_FUNDS)
@@ -72,21 +72,13 @@ export default function ShowModal(props: any) {
 
     function onChooseValidator(validator: ValidatorT) {
         setSelectedValidator(validator)
-        console.log(validator)
         props.showModal(TYPE_STAKE_FUNDS_CONFIRM)
     }
 
     return (
         <div id="modal" className={`
             modal-form 
-            ${props.showingModal ? '' : 'hidden'}
-            ${props.showingForm == TYPE_SEND_FUNDS ? 'send-funds-top' : ''}
-            ${props.showingForm == TYPE_SEND_FUNDS_CONFIRM ? 'send-funds-confirm-top' : ''}
-
-            ${props.showingForm == TYPE_STAKE_FUNDS && props.promotedValidators.length > 3 ? 'choose-validator-top' : ''}
-            ${props.showingForm == TYPE_STAKE_FUNDS_CONFIRM ? 'choose-validator-confirm-top' : ''}
-            ${props.showingForm == TYPE_STAKE_FUNDS_CONFIRM_2 ? 'choose-validator-confirm-2-top' : ''}
-            ${props.showingForm == TYPE_CONFIRM_CLEAR_WALLET ? 'confirm-clear-wallet-top' : ''}`}>
+            ${props.showingModal ? '' : 'hidden'}`}>
 
             {props.showingForm !== TYPE_SEND_FUNDS_CONFIRM &&
                 <Close className="modal-close" onClick={() => { props.closeModal() }} />
@@ -126,7 +118,7 @@ export default function ShowModal(props: any) {
             }
 
             {props.showingForm == TYPE_STAKE_FUNDS_CONFIRM &&
-                <ChooseStakeInputs
+                <StakeFunds
                     onCancelStake={onCancelStake}
                     onNeedsToConfirmStake={onNeedsToConfirmStake}
                     selectedValidator={selectedValidator}
@@ -134,7 +126,7 @@ export default function ShowModal(props: any) {
             }
 
             {props.showingForm == TYPE_STAKE_FUNDS_CONFIRM_2 &&
-                <ConfirmStakeInputs
+                <ConfirmStakeFunds
                     stakeToConfirm={confirmStake}
                     selectedValidator={selectedValidator}
                     wallet={props.wallet}

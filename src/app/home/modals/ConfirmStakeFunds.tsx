@@ -3,7 +3,7 @@ import BigNumber from "bignumber.js"
 import { useEffect, useState } from "react"
 import { Wallet } from "../../../classes/wallet"
 import "../../css/ChooseValidator.css"
-import { SignedTransactionT, StakeT, ValidatorT } from "../../types"
+import { SignedTransactionT, StakeT, UnsignedTransactionT, ValidatorT } from "../../types"
 import { finalizeTransaction, getValidators, startNewStake } from "../../utils/background"
 import { formatAddress, formatBigNumber, handleKeyDown, validateAmount } from "../../utils/formatters"
 import { TYPE_SEND_FUNDS_CONFIRM, TYPE_STAKE_FUNDS_CONFIRM } from "../ShowModal"
@@ -11,13 +11,13 @@ import { TYPE_SEND_FUNDS_CONFIRM, TYPE_STAKE_FUNDS_CONFIRM } from "../ShowModal"
 export interface IProps {
     selectedValidator: ValidatorT,
     wallet: Wallet,
-    stakeToConfirm: {fields: StakeT, reply: any},
+    stakeToConfirm: {fields: StakeT, reply: UnsignedTransactionT},
     onCancelStake: Function,
     onStakeFinish: Function
 }
 
 let counter: any
-export function ConfirmStakeInputs(props: IProps) {
+export function ConfirmStakeFunds(props: IProps) {
     let [error, setError] = useState("")
     let [count, setCount] = useState(8);
     let [finished, setFinished] = useState(false);
@@ -49,16 +49,16 @@ export function ConfirmStakeInputs(props: IProps) {
 
     async function onSubmitStake() {
         clearTimer()
-        const blob = props.stakeToConfirm.reply.transaction.blob
+        const blob = props.stakeToConfirm.reply.payload_to_sign
 
         let currentAccount = props.wallet.radixPublicAddresses[props.wallet.selectedAddress] as AccountT
-        const signed = await currentAccount.sign(props.stakeToConfirm.reply.transaction, undefined)
+        const signed = currentAccount.sign({ hashOfBlobToSign: blob } as any, undefined)
 
         signed.forEach(async (item) => {
             let der = item.toDER();
             let pubKey = currentAccount.publicKey.__hex
 
-            const transactionPayload = { blob: blob, publicKeyOfSigner: pubKey, signatureDER: der } as SignedTransactionT
+            const transactionPayload = { unsigned_transaction: props.stakeToConfirm.reply.unsigned_transaction, pubKey: pubKey, bytes: der } as SignedTransactionT
             const transactionResponse = await finalizeTransaction(transactionPayload)
             if (transactionResponse)
                 props.onStakeFinish(transactionResponse)
@@ -71,14 +71,14 @@ export function ConfirmStakeInputs(props: IProps) {
         <div className="modal-form-container">
             <h1 className="normal-1">Stake Funds</h1>
             {error && <p className="warn-save-title no-margin small">{error}</p>}
-            {props.wallet && props.selectedValidator.name != "" && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
+            {props.wallet && props.selectedValidator.properties.name != "" && props.wallet.selectedAddress < props.wallet.radixPublicAddresses.length &&
                 <div className="modal-form-column-centered">
                     <div className="centered-flex w-100">
                         <p className="info-password-title small info-send-funds-title no-margin">Name:</p>
                         <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
-                                defaultValue={props.selectedValidator.name}
+                                defaultValue={props.selectedValidator.properties.name}
                                 className="input-password w-100 small"
                                 type="string"></input>
                         </div>
@@ -88,7 +88,7 @@ export function ConfirmStakeInputs(props: IProps) {
                         <div className="info-content-wrapper w-100">
                             <input
                                 disabled={true}
-                                defaultValue={formatAddress(props.selectedValidator.address)}
+                                defaultValue={formatAddress(props.selectedValidator.validator_identifier.address)}
                                 className="input-password w-100 small"
                                 type="string"></input>
                         </div>
@@ -99,7 +99,7 @@ export function ConfirmStakeInputs(props: IProps) {
                             <div className="info-content-wrapper">
                                 <input
                                     disabled={true}
-                                    defaultValue={`${props.selectedValidator.validatorFee}%`}
+                                    defaultValue={`${props.selectedValidator.properties.validator_fee_percentage}%`}
                                     className="input-password small w-100"
                                     type="string"></input>
                             </div>
@@ -109,7 +109,7 @@ export function ConfirmStakeInputs(props: IProps) {
                             <div className="info-content-wrapper">
                                 <input
                                     disabled={true}
-                                    defaultValue={`${props.selectedValidator.uptimePercentage}%`}
+                                    defaultValue={`${props.selectedValidator.info.uptime.uptime_percentage}%`}
                                     className="input-password small w-100"
                                     type="string"></input>
                             </div>
@@ -130,13 +130,13 @@ export function ConfirmStakeInputs(props: IProps) {
                         <div>
                             <p className="info-password-title small info-send-funds-title no-margin">Fee:</p>
                             <div className="info-content-wrapper">
-                                <p className="info-password-title green-text small no-margin">{`${props.stakeToConfirm.reply.fee != "" ? formatBigNumber(new BigNumber(props.stakeToConfirm.reply.fee).shiftedBy(-18)) : ""} XRD`}</p>
+                                <p className="info-password-title green-text small no-margin">{`${formatBigNumber(new BigNumber(props.stakeToConfirm.reply.fee.value).shiftedBy(-18))} XRD`}</p>
                             </div>
                         </div>
                         <div>
                             <p className="info-password-title small info-send-funds-title no-margin">Total:</p>
                             <div className="info-content-wrapper">
-                                <p className="info-password-title green-text small no-margin">{`${props.stakeToConfirm.reply.fee != "" ? new BigNumber(props.stakeToConfirm.fields.amount).shiftedBy(18).plus(props.stakeToConfirm.reply.fee).shiftedBy(-18) : ""} XRD`}</p>
+                                <p className="info-password-title green-text small no-margin">{`${new BigNumber(props.stakeToConfirm.fields.amount).shiftedBy(18).plus(props.stakeToConfirm.reply.fee.value).shiftedBy(-18)} XRD`}</p>
                             </div>
                         </div>
                     </div>

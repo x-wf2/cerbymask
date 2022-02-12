@@ -38,10 +38,10 @@ export class LocalProvider implements Provider {
 
     constructor(networkFactory?: NetworkFactoryInterface, walletFactory?: WalletFactoryInterface) {
         this.walletFactory = walletFactory || new LocalWalletFactory()
-        this.networkFactory = networkFactory || new NetworkFactory(([NETWORKS.MAINNET]))
+        this.networkFactory = networkFactory || new NetworkFactory(([NETWORKS.mainnet]))
 
         if(!networkFactory)
-            this.networkFactory.setSelectedNetwork(NETWORKS.MAINNET)
+            this.networkFactory.setSelectedNetwork(NETWORKS.mainnet)
     }
 
     getCurrentNetwork(): Promise<Network> {

@@ -1,6 +1,4 @@
-import React from "react"
 import { useState } from "react"
-import { Wallet } from "../../classes/wallet"
 
 export default function GenerateWallet(props: any) {
     const [seedSaved, setSeedSaved] = useState(false)

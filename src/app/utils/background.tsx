@@ -1,6 +1,6 @@
 import { Network } from "../../classes/network"
 import { Wallet } from "../../classes/wallet"
-import { RequestT, SignedTransactionT, StakeT, TransactionFieldsT } from "../types"
+import { RequestT, SignedTransactionT, StakeT, TransactionFieldsT, ValidatorT } from "../types"
 import { XRD_RRI } from "./utils"
 
 export function getCurrentXRDUSDValue(): Promise<any> {
@@ -13,35 +13,36 @@ export function getCurrentXRDUSDValue(): Promise<any> {
 export function getWalletBalance(address: string): Promise<any> {
     return new Promise(async (resolve) => {
         let response = await generateBackgroundRequest("get-wallet-funds", { address: address })
-        let xrdBalances = response.filter((item: any) => { return XRD_RRI.indexOf(item.rri) != -1 })
-        let filtered = xrdBalances.map((item: any) => { return { ...item, amount: item.amount } })
-        resolve(filtered)
+        let xrdBalances = response.liquid_balances.filter((item: any) => { return XRD_RRI.indexOf(item.token_identifier.rri) != -1 })
+        let filtered = xrdBalances.map((item: any) => { return { ...item } })
+        resolve(filtered.length > 0 ? filtered[0].value : 0)
     })
 }
 
 export function getAddressTokens(address: string): Promise<any> {
     return new Promise(async (resolve) => {
         let response = await generateBackgroundRequest("get-wallet-funds", { address: address })
-        let balances = response.filter((item: any) => { return XRD_RRI.indexOf(item.rri) == -1 })
+        let balances = response.liquid_balances.filter((item: any) => { return XRD_RRI.indexOf(item.token_identifier.rri) == -1 })
         balances = Promise.all(balances.map(async (item: any) => {
-            let tokenInfo = await generateBackgroundRequest("get-token-info", { rri: item.rri })
-            return { ...item, tokenInfo: tokenInfo.result }
+            return { ...item, tokenInfo: { symbol: item.token_identifier.rri.split("_")[0]  } }
         }))
         resolve(balances)
     })
 }
 
+
 export function getStakedPositions(address: string): Promise<any> {
     return new Promise(async (resolve) => {
-        let response = await generateBackgroundRequest("get-staked-positions", { address: address })
-        resolve(response)
+        let response = await generateBackgroundRequest("get-wallet-funds", { address: address })
+        resolve(response.staked_and_unstaking_balance)
     })
 }
 
-export function getValidators(size: number): Promise<any> {
+export function getValidators(): Promise<any> {
     return new Promise(async (resolve) => {
-        let response = await generateBackgroundRequest("get-validators", { size: size })
-        resolve(response)
+        let response = await generateBackgroundRequest("get-validators", {})
+        let acceptingStake = response.validators.filter((validator: ValidatorT) => validator.properties.external_stake_accepted)
+        resolve(acceptingStake)
     })
 }
 
@@ -61,8 +62,8 @@ export function setNetwork(network: Network) {
 
 export function startNewTransaction(transaction: TransactionFieldsT) {
     return new Promise(async (resolve, reject) => {
-        let response = await generateBackgroundRequest("build-transaction", { transaction: transaction, type: "TokenTransfer" })
-        resolve(response)
+        let response = await generateBackgroundRequest("build-transaction", { transaction: transaction, type: "TransferTokens" })
+        resolve(response.transaction_build)
     })
 }
 
@@ -76,7 +77,7 @@ export function finalizeTransaction(transaction: SignedTransactionT) {
 export function startNewStake(stake: StakeT) {
     return new Promise(async (resolve, reject) => {
         let response = await generateBackgroundRequest("build-transaction", { transaction: stake, type: "StakeTokens" })
-        resolve(response)
+        resolve(response.transaction_build)
     })
 }
 

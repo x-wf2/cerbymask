@@ -7,7 +7,6 @@ import { Download } from "@styled-icons/boxicons-solid"
 import { TYPE_RECEIVE_FUNDS, TYPE_SEND_FUNDS, TYPE_STAKE_FUNDS } from "./ShowModal"
 import BigNumber from "bignumber.js"
 import { clearInterval } from "timers"
-import Footer from "./components/Footer"
 
 export function TokensSection(props: any) {
     return (
@@ -37,7 +36,7 @@ export function TokensSection(props: any) {
                                     <DollarCircle width="16px" />
                                 </div>
                                 <span>
-                                    {formatBigNumber(new BigNumber(tokenInfo.amount).shiftedBy(-18))}
+                                    {formatBigNumber(new BigNumber(tokenInfo.value).shiftedBy(-18))}
                                     &nbsp;{tokenInfo.tokenInfo.symbol}
                                 </span>
                             </p>
@@ -62,7 +61,7 @@ export function WalletChart(props: any) {
             {props.full &&
                 <p className={`show-wallet-eq-balance position-fix ${props.full ? "small" : ""}`} style={{ marginTop: "6px" }}>
                     {props.value2 && `$${props.value2}`}
-                    {!props.value2 && `$0`}
+                    {!props.value2 && `$0.00`}
                     &nbsp;USD
                 </p>
             }
@@ -86,7 +85,7 @@ export default function ShowWallet(props: any) {
     }
 
     return (
-        <div className="full-height-container" style={{ width: "100%", overflowX: "auto", wordBreak: "break-all" }}>
+        <div className="h-100">
             <div className="show-wallet-header">
                 <div className="show-wallet-choose-address-container">
                     <select onChange={onAddressChange} className="show-wallet-choose-address green-text">
@@ -108,7 +107,7 @@ export default function ShowWallet(props: any) {
                     &nbsp;USD
                 </p>
             </div>
-            <div className="show-wallet-main-actions">
+            <div className="show-wallet-main-actions centered-flex">
                 <div className="show-wallet-main-actions-buttons">
                     <button className="show-wallet-main-action-button" type="button" onClick={() => props.showModal(TYPE_RECEIVE_FUNDS)}>
                         <div className="show-wallet-main-action-circle">
@@ -146,7 +145,6 @@ export default function ShowWallet(props: any) {
                 {/* Tokens */}
                 <TokensSection wallet={props.wallet} />
             </div>
-            <Footer/>
         </div>
     )
 }
