@@ -73,8 +73,6 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
     }
     saveWallet(keystore: KeystoreT, wallet: Wallet, storage = chrome.storage): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
-            const json = JSON.stringify(keystore, null, '\t')
-
             storage.local.set({ "keystore": keystore }, () => {
                 const error = chrome.runtime.lastError;
                 if (error) return reject(error)
@@ -113,7 +111,6 @@ export default class LocalWalletFactory implements WalletFactoryInterface {
                                 wallet.addresses = addresses["addresses"]
                                 wallet.currency = currency["currency"]
 
-                                console.log(wallet)
                                 resolve(wallet)
                             })
                         })

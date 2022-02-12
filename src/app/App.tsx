@@ -50,11 +50,13 @@ interface ICerbieState {
     onUnlockWallet: Function;
     onNetworkChange: Function;
     onSidebarOpen: Function;
+    onClearWallet: Function;
 }
 
 export default class App extends Component<ICerbieProps, ICerbieState> {
 
-    networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
+    // networkFactory = new NetworkFactory(([NETWORKS.MAINNET, NETWORKS.STOKENET]), NETWORKS.MAINNET);
+    networkFactory = new NetworkFactory(([NETWORKS.MAINNET]), NETWORKS.MAINNET);
 
     constructor(props: any) {
         super(props)
@@ -117,6 +119,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 this.setState((state) => ({ ...state, wallet: { ...state.wallet, radixWallet: radixWallet, unlocked: true } }))
                 this.refreshWalletAddresses()
                 await this.refreshWalletInfo()
+                console.log(this.state.wallet)
             },
             onNetworkChange: async (e: any) => {
                 const name = e.target.value
@@ -127,6 +130,13 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
             },
             onSidebarOpen: (opened: boolean) => {
                 this.setState(state => ({...state, showingSidebar: opened}))
+            },
+            onClearWallet: async () => {
+                await chrome.storage.local.clear();
+                await this.state.provider.newWallet()
+                this.state.wallet.unlocked = false
+                this.state.wallet.key = undefined
+                this.closeModal()
             }
         }
     }
@@ -165,7 +175,6 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
         this.state.wallet.radixTokens = tokens
         this.state.wallet.network = this.networkFactory.selectedNetwork
 
-        console.log(this.state.wallet)
         this.setState((state) => ({
             ...state,
             wallet: {
@@ -210,7 +219,8 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                 <Navbar
                     wallet={this.state.wallet}
                     sidebarOpened={this.state.showingSidebar}
-                    onSidebarOpen={(opened: any) => this.state.onSidebarOpen(opened)}/>
+                    onSidebarOpen={(opened: any) => this.state.onSidebarOpen(opened)}
+                    showModal={(type: number) => this.showModal(type)}/>
                 <ShowModal
                     wallet={this.state.wallet}
                     showingModal={this.state.showingModal}
@@ -218,6 +228,7 @@ export default class App extends Component<ICerbieProps, ICerbieState> {
                     promotedValidators={this.state.promotedValidators}
                     closeModal={() => this.closeModal()}
                     showModal={(type: number) => this.showModal(type)}
+                    onClearWallet={() => this.state.onClearWallet()}
                     refreshWalletInfo={() => this.refreshWalletInfo()}/>
                 <div
                     onClick={() => this.onAppBodyClick()} 

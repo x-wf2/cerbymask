@@ -12,15 +12,20 @@ import { ChooseValidator } from "./modals/ChooseValidator"
 import { StakeT, ValidatorT } from "../types"
 import { ChooseStakeInputs } from "./modals/ChooseStakeInputs"
 import { ConfirmStakeInputs } from "./modals/ConfirmStakeInputs"
+import { RevealSeedPhrase } from "./modals/RevealSeedPhrase"
+import { ConfirmClearWallet } from "./modals/ConfirmClearWallet"
 
 export const TYPE_RECEIVE_FUNDS = 1
 
-export const TYPE_SEND_FUNDS = 2
-export const TYPE_SEND_FUNDS_CONFIRM = 3
+export const TYPE_SEND_FUNDS            = 2
+export const TYPE_SEND_FUNDS_CONFIRM    = 3
 
-export const TYPE_STAKE_FUNDS = 4
-export const TYPE_STAKE_FUNDS_CONFIRM = 5
+export const TYPE_STAKE_FUNDS           = 4
+export const TYPE_STAKE_FUNDS_CONFIRM   = 5
 export const TYPE_STAKE_FUNDS_CONFIRM_2 = 6
+
+export const TYPE_REVEAL_SEED_PHRASE    = 7
+export const TYPE_CONFIRM_CLEAR_WALLET  = 8
 
 export default function ShowModal(props: any) {
 
@@ -80,7 +85,8 @@ export default function ShowModal(props: any) {
 
             ${props.showingForm == TYPE_STAKE_FUNDS && props.promotedValidators.length > 3 ? 'choose-validator-top' : ''}
             ${props.showingForm == TYPE_STAKE_FUNDS_CONFIRM ? 'choose-validator-confirm-top' : ''}
-            ${props.showingForm == TYPE_STAKE_FUNDS_CONFIRM_2 ? 'choose-validator-confirm-2-top' : ''}`}>
+            ${props.showingForm == TYPE_STAKE_FUNDS_CONFIRM_2 ? 'choose-validator-confirm-2-top' : ''}
+            ${props.showingForm == TYPE_CONFIRM_CLEAR_WALLET ? 'confirm-clear-wallet-top' : ''}`}>
 
             {props.showingForm !== TYPE_SEND_FUNDS_CONFIRM &&
                 <Close className="modal-close" onClick={() => { props.closeModal() }} />
@@ -134,6 +140,19 @@ export default function ShowModal(props: any) {
                     wallet={props.wallet}
                     onCancelStake={onCancelStake}
                     onStakeFinish={onStakeFinish}/>
+            }
+
+            {props.showingForm == TYPE_REVEAL_SEED_PHRASE &&
+                <RevealSeedPhrase
+                    wallet={props.wallet}>
+                </RevealSeedPhrase>
+            }
+            {props.showingForm == TYPE_CONFIRM_CLEAR_WALLET &&
+                <ConfirmClearWallet
+                    wallet={props.wallet}
+                    onCancel={() => props.closeModal()}
+                    onConfirm={() => props.onClearWallet()}>
+                </ConfirmClearWallet>
             }
         </div>
     )

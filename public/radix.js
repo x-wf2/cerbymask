@@ -19,6 +19,7 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 })
 
 chrome.runtime.onMessage.addListener((request, sender, reply) => {
+    console.log(request.title)
     if (request.title == "get-wallet-funds") {
         handleGetWalletFunds(request, reply)
     }
@@ -228,7 +229,17 @@ function getNetworkFromAddress(address) {
 function refreshNetwork() {
     return new Promise((resolve) => {
         chrome.storage.local.get(["network"], async (network) => {
+            if (network["network"] == undefined)
+                network["network"] = setMainnet()
+            currentNetwork = network["network"]
             resolve(JSON.parse(network["network"]))
         })  
     })
+}
+
+// Set stored network to MAINNET
+function setMainnet() {
+    let mainnet = { name: "MAINNET", url: "https://mainnet.radixdlt.com/" }
+    chrome.storage.local.set({ "network": mainnet })
+    return mainnet
 }
