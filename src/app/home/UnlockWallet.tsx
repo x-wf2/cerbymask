@@ -3,7 +3,7 @@ import { Network } from "../../classes/network"
 
 export default function UnlockWallet(props: any) {
     return (
-        <div>
+        <div className="w-100">
             {props.error && <p className="warn-save-title warn-save-title-main no-margin">{props.error}</p>}
             <div className="show-wallet-choose-address-container">
                 <select onChange={props.onNetworkChange} className="show-wallet-choose-network small">
@@ -19,7 +19,7 @@ export default function UnlockWallet(props: any) {
             <p className="info-password-title">Welcome Back!</p>
             <div>
                 <div className="info-content-wrapper">
-                    <input className="input-password" type="password" onChange={(e) => props.onPasswordChange(e)}></input>
+                    <input className="input-password w-100" type="password" onChange={(e) => props.onPasswordChange(e)}></input>
                 </div>
             </div>
             <div className="info-content-actions">
